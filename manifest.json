@@ -1,0 +1,14 @@
+{
+  "name": "EVIVI Gestion",
+  "short_name": "Gestion",
+  "description": "Gestion tickets et clients EVIVI",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#fdf5ee",
+  "theme_color": "#a11313",
+  "orientation": "portrait",
+  "icons": [
+    { "src": "icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any maskable" },
+    { "src": "icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any maskable" }
+  ]
+}

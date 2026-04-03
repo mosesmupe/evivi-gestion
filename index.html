@@ -1,0 +1,1190 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="EVIVI Gestion">
+<meta name="format-detection" content="telephone=no">
+<meta name="theme-color" content="#a11313">
+<title>EVIVI Gestion</title>
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="icon-192.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<script src="https://unpkg.com/lucide@latest"></script>
+<style>
+:root{--red:#a11313;--rd:#7d0e0e;--or:#f49739;--bg:#f7f2ee;--surf:#fff;--surf2:#fdf5ee;--tx:#1a0808;--mu:#8a6a5a;--bo:rgba(161,19,19,.1);--ok:#16a34a;--bl:#2563eb;--safe-t:env(safe-area-inset-top,0px);--safe-b:env(safe-area-inset-bottom,0px);}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
+html,body{height:100%;overflow:hidden;}
+body{font-family:'Plus Jakarta Sans',-apple-system,BlinkMacSystemFont,sans-serif;background:var(--bg);color:var(--tx);}
+.shell{display:flex;flex-direction:column;height:100vh;height:calc(var(--vh,1vh)*100);}
+.top{background:var(--surf);border-bottom:1px solid var(--bo);display:flex;align-items:center;gap:10px;padding:10px 16px;padding-top:calc(var(--safe-t) + 10px);flex-shrink:0;}
+.top-icon{width:30px;height:30px;border-radius:8px;overflow:hidden;flex-shrink:0;}
+.top-icon img{width:100%;height:100%;object-fit:cover;}
+.top-title{font-size:16px;font-weight:800;flex:1;color:var(--tx);}
+.top-btn{width:32px;height:32px;background:var(--surf2);border:none;border-radius:8px;display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--mu);}
+.content{flex:1;overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:touch;}
+.content::-webkit-scrollbar{display:none;}
+.bnav{background:var(--or);display:flex;padding-bottom:var(--safe-b);flex-shrink:0;position:relative;border-radius:0;}
+.bn-curve{position:absolute;top:-24px;left:0;right:0;height:26px;pointer-events:none;z-index:0;}
+.bn{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:10px 2px 8px;cursor:pointer;color:rgba(255,255,255,.6);font-size:9px;font-weight:700;gap:4px;border:none;background:transparent;font-family:inherit;transition:all .35s cubic-bezier(.4,0,.2,1);position:relative;z-index:2;}
+.bn span{transition:opacity .25s,transform .25s;display:block;opacity:0;height:0;overflow:hidden;}
+.bn.on{color:#fff;}
+.bn.on span{opacity:1;height:auto;}
+.bn.on i,.bn.on svg{transform:translateY(-14px) scale(1.2);transition:transform .35s cubic-bezier(.4,0,.2,1);}
+.bn i,.bn svg{transition:transform .35s cubic-bezier(.4,0,.2,1);}
+.view{display:none;padding:16px;padding-bottom:calc(80px + var(--safe-b));}
+.view.show{display:block;}
+.ph{margin-bottom:14px;}
+.ph h1{font-size:20px;font-weight:800;}
+.ph p{font-size:12px;color:var(--mu);margin-top:2px;}
+.ph-row{display:flex;align-items:flex-start;justify-content:space-between;gap:10px;}
+.card{background:var(--surf);border:1px solid var(--bo);border-radius:13px;padding:14px;margin-bottom:11px;}
+.ct{font-size:10px;font-weight:700;letter-spacing:1.2px;color:var(--red);text-transform:uppercase;margin-bottom:11px;}
+.kpis{display:grid;gap:9px;margin-bottom:12px;}
+.g2{grid-template-columns:1fr 1fr;}.g4{grid-template-columns:1fr 1fr 1fr 1fr;}
+.kpi{background:var(--surf);border:1px solid var(--bo);border-radius:12px;padding:12px 10px;}
+.kn{font-size:22px;font-weight:800;line-height:1;}.kl{font-size:9px;font-weight:700;color:var(--mu);letter-spacing:.4px;text-transform:uppercase;margin-top:3px;}
+.btn{padding:10px 14px;border:none;border-radius:10px;font-family:inherit;font-size:13px;font-weight:700;cursor:pointer;display:inline-flex;align-items:center;gap:6px;transition:opacity .15s;white-space:nowrap;}
+.btn:active{opacity:.8;}
+.br{background:var(--or);color:#fff;}
+.bg{background:var(--surf2);border:1px solid var(--bo);color:var(--mu);}
+.bout{background:transparent;border:1.5px solid rgba(161,19,19,.22);color:var(--red);}
+.bf{width:100%;justify-content:center;}.bsm{padding:7px 11px;font-size:12px;}
+.f{margin-bottom:10px;}
+.f label{display:block;font-size:11px;font-weight:600;color:var(--mu);margin-bottom:4px;}
+.f input,.f select,.f textarea{width:100%;padding:10px 12px;background:var(--surf2);border:1.5px solid var(--bo);border-radius:10px;color:var(--tx);font-family:inherit;font-size:14px;font-weight:600;outline:none;-webkit-appearance:none;transition:border-color .15s;}
+.f input:focus,.f select:focus,.f textarea:focus{border-color:var(--red);background:var(--surf);}
+.f input::placeholder,.f textarea::placeholder{color:var(--mu);font-weight:400;opacity:.7;}
+.f textarea{resize:vertical;line-height:1.6;font-size:13px;}
+.r2{display:grid;grid-template-columns:1fr 1fr;gap:9px;}.r3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;}
+.badge{display:inline-block;padding:2px 8px;border-radius:20px;font-size:10px;font-weight:700;}
+.bred{background:rgba(161,19,19,.08);color:var(--red);}.bbl{background:rgba(37,99,235,.08);color:var(--bl);}.bmu{background:rgba(138,106,90,.1);color:var(--mu);}.bok{background:rgba(22,163,74,.1);color:var(--ok);}
+.tbl-wrap{overflow-x:auto;}
+.tbl{width:100%;border-collapse:collapse;font-size:12px;}
+.tbl th{background:var(--surf2);padding:7px 9px;text-align:left;font-size:9px;font-weight:700;color:var(--mu);text-transform:uppercase;letter-spacing:.5px;border-bottom:2px solid var(--bo);}
+.tbl td{padding:8px 9px;border-bottom:1px solid var(--bo);color:var(--tx);vertical-align:middle;}
+.tbl tr:last-child td{border-bottom:none;}
+.cl-item{display:flex;align-items:center;gap:12px;padding:12px 0;border-bottom:1px solid var(--bo);cursor:pointer;}
+.cl-item:last-child{border-bottom:none;}
+.cl-av{width:38px;height:38px;border-radius:10px;background:var(--or);display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:800;color:#fff;flex-shrink:0;}
+.cl-name{font-size:14px;font-weight:700;color:var(--tx);}
+.cl-meta{font-size:11px;color:var(--mu);margin-top:2px;}
+.fiche-header{background:var(--or);border-radius:13px;padding:16px;margin-bottom:12px;color:#fff;}
+.fiche-name{font-size:20px;font-weight:800;margin-bottom:4px;}
+.fiche-sub{font-size:12px;opacity:.8;}
+.fiche-ticket{background:rgba(255,255,255,.15);border-radius:9px;padding:9px 12px;margin-top:10px;font-size:13px;font-weight:700;}
+.info-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px;}
+.info-item{background:var(--surf2);border-radius:9px;padding:9px 11px;}
+.info-lbl{font-size:9.5px;font-weight:700;color:var(--mu);text-transform:uppercase;letter-spacing:.4px;margin-bottom:3px;}
+.info-val{font-size:13px;font-weight:700;color:var(--tx);}
+.msg-prev{background:var(--surf2);border:1px solid var(--bo);border-radius:10px;padding:12px;font-size:12.5px;line-height:1.75;white-space:pre-wrap;font-family:inherit;margin-bottom:10px;word-break:break-word;color:var(--tx);min-height:60px;}
+.tabs{display:flex;gap:3px;background:var(--surf2);border-radius:9px;padding:3px;margin-bottom:12px;}
+.tab{flex:1;padding:7px;background:transparent;border:none;border-radius:6px;font-family:inherit;font-size:11px;font-weight:700;color:var(--mu);cursor:pointer;text-align:center;}
+.tab.on{background:var(--surf);color:var(--red);box-shadow:0 1px 4px rgba(161,19,19,.07);}
+.dz{border:2px dashed rgba(161,19,19,.2);border-radius:11px;padding:18px;text-align:center;cursor:pointer;background:var(--surf2);}
+.dz p{font-size:12.5px;color:var(--mu);}
+.chart-bars{display:flex;align-items:flex-end;gap:5px;height:70px;margin-top:6px;}
+.cb{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;}
+.cb-fill{width:100%;border-radius:3px 3px 0 0;min-height:3px;background:var(--or);}
+.cb-lbl{font-size:9px;color:var(--mu);font-weight:600;}
+.sb-row{display:flex;align-items:center;gap:8px;margin-bottom:6px;}
+.sb-lbl{font-size:11.5px;font-weight:600;min-width:100px;flex-shrink:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.sb-track{flex:1;background:var(--surf2);border-radius:4px;height:7px;overflow:hidden;}
+.sb-fill{height:7px;border-radius:4px;background:var(--or);}
+.sb-val{font-size:11px;font-weight:700;color:var(--mu);min-width:42px;text-align:right;}
+.overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:400;align-items:flex-end;}
+.overlay.show{display:flex;}
+.modal{background:var(--surf);border-radius:20px 20px 0 0;padding:20px 16px;padding-bottom:calc(20px + var(--safe-b));width:100%;max-height:92vh;overflow-y:auto;}
+.mttl{font-size:17px;font-weight:800;margin-bottom:14px;color:var(--tx);display:flex;align-items:center;justify-content:space-between;}
+.mc{background:var(--surf2);border:none;border-radius:7px;width:28px;height:28px;cursor:pointer;color:var(--mu);font-size:16px;}
+.toast{position:fixed;bottom:calc(74px + var(--safe-b));left:50%;transform:translateX(-50%);background:var(--red);color:#fff;padding:9px 18px;border-radius:20px;font-size:13px;font-weight:700;z-index:999;pointer-events:none;opacity:0;transition:opacity .2s;white-space:nowrap;}
+.toast.show{opacity:1;}
+.empty{text-align:center;padding:32px 16px;color:var(--mu);}
+.empty-t{font-size:14px;font-weight:700;color:var(--tx);margin-bottom:4px;}
+.empty-s{font-size:12px;}
+.back-btn{display:flex;align-items:center;gap:6px;background:none;border:none;font-family:inherit;font-size:13px;font-weight:700;color:var(--red);cursor:pointer;padding:0;margin-bottom:14px;}
+@media(max-width:430px){.g4{grid-template-columns:1fr 1fr;}.r3{grid-template-columns:1fr 1fr;}.r2{grid-template-columns:1fr;}}
+/* Dark mode */
+body.dark{--bg:#1c1412;--surf:#2a1f1a;--surf2:#231a15;--tx:#f5e8dc;--mu:#b89878;--bo:rgba(244,151,57,.15);--red:#c4541a;--or:#f49739;}
+body.dark .top{background:var(--surf);border-color:var(--bo);}
+body.dark .bnav{background:var(--or);}
+body.dark .fiche-header{background:var(--or);}
+body.dark .msg-prev{background:var(--surf2);border-color:var(--bo);color:var(--tx);}
+body.dark .overlay{background:rgba(0,0,0,.7);}
+body.dark .modal{background:var(--surf);}
+body.dark input,body.dark select,body.dark textarea{background:var(--surf2);border-color:var(--bo);color:var(--tx);}
+body.dark .dz{background:var(--surf2);border-color:rgba(244,151,57,.15);}
+</style>
+</head>
+<body>
+<div class="shell">
+<div class="top">
+  <div class="top-icon"><img src="icon-192.png" alt="EVIVI"></div>
+  <div class="top-title" id="topTitle">Dashboard</div>
+  <button class="top-btn" id="btnDark" onclick="toggleDark()">
+    <i data-lucide="sun" id="icSun" style="width:16px;height:16px;display:none;"></i>
+    <i data-lucide="moon" id="icMoon" style="width:16px;height:16px;"></i>
+  </button>
+  <button class="top-btn" onclick="openM('mBackup')">
+    <i data-lucide="download" style="width:16px;height:16px;"></i>
+  </button>
+</div>
+
+<div class="content" id="content">
+
+  <!-- DASHBOARD -->
+  <div class="view show" id="vDash">
+    <div class="ph"><h1>Bonjour, Mr MUPENDANA</h1><p id="dashDate"></p></div>
+    <div id="dashBackupReminder" style="display:none;"></div>
+    <div class="kpis g4">
+      <div class="kpi"><div class="kn" style="color:var(--bl)" id="dk-dispo">0</div><div class="kl">Tickets dispo</div></div>
+      <div class="kpi"><div class="kn" style="color:var(--ok)" id="dk-actif">0</div><div class="kl">Attribués</div></div>
+      <div class="kpi"><div class="kn" style="color:var(--red)" id="dk-clients">0</div><div class="kl">Clients</div></div>
+      <div class="kpi"><div class="kn" style="color:var(--or)" id="dk-today">0</div><div class="kl">Aujourd'hui</div></div>
+    </div>
+    <div class="kpis g2" style="margin-bottom:12px;">
+      <div class="kpi"><div class="kn" style="color:var(--ok)" id="dk-revenue">0</div><div class="kl">Revenus (CFA)</div></div>
+      <div class="kpi"><div class="kn" style="color:var(--or)" id="dk-noavis">0</div><div class="kl">Avis en attente</div></div>
+    </div>
+    <div class="card"><div class="ct">Clients récents</div><div id="dashActs"></div></div>
+    <div class="card"><div class="ct">Nouveaux clients — 7 jours</div><div class="chart-bars" id="dashChart"></div></div>
+    <div class="card"><div class="ct">Forfaits les plus utilisés</div><div id="dashForfaits"></div></div>
+    <div class="card"><div class="ct">Historique récent</div><div id="dashLogs"></div></div>
+  </div>
+
+  <!-- NOUVEAU CLIENT -->
+  <div class="view" id="vImport">
+    <div class="ph"><h1>Nouveau client</h1><p>Enregistre et envoie le code d'accès</p></div>
+
+    <!-- Étape 1 : Saisie -->
+    <div id="newStep1">
+      <div class="card">
+        <div class="ct">Coller depuis WhatsApp</div>
+        <div class="f"><input type="text" id="f-paste" placeholder="Ex : Je m'appelle Kofi Agbessi" oninput="autoParseName()"></div>
+        <button class="btn bg bf bsm" onclick="pasteFromClip()" style="margin-bottom:10px;">Coller le message</button>
+      </div>
+      <div class="card">
+        <div class="ct">Infos du client</div>
+        <div class="r2">
+          <div class="f"><label>Prénom</label><input type="text" id="f-prenom" placeholder="Kofi"></div>
+          <div class="f"><label>Nom</label><input type="text" id="f-nom" placeholder="Agbessi"></div>
+        </div>
+        <div id="saveAlert" style="margin-bottom:8px;font-size:12px;font-weight:600;"></div>
+        <button class="btn br bf" onclick="saveClient()">Enregistrer le client</button>
+      </div>
+    </div>
+
+    <!-- Étape 2 : Offrir ou Vendre -->
+    <div id="newStep2" style="display:none;">
+      <div style="background:rgba(22,163,74,.07);border:1px solid rgba(22,163,74,.2);border-radius:12px;padding:13px 14px;margin-bottom:12px;text-align:center;">
+        <div style="font-size:14px;font-weight:800;color:var(--ok);margin-bottom:3px;" id="newConfirm">Client enregistré !</div>
+      </div>
+      <div class="tabs" style="margin-bottom:10px;">
+        <button class="tab on" id="ntOff" onclick="newTypeTab('offrir')">Offrir</button>
+        <button class="tab" id="ntVen" onclick="newTypeTab('vendre')">Vendre</button>
+      </div>
+      <div class="card">
+        <div class="ct" id="newTypeLabel">Offrir un accès gratuit</div>
+        <div class="f"><label>Forfait</label><select id="new-forfait"></select></div>
+        <button class="btn br bf" id="btnAssignNew" onclick="assignTicketNew()">Attribuer le ticket</button>
+        <div id="newAssignAlert" style="margin-top:8px;font-size:12px;font-weight:600;"></div>
+      </div>
+    </div>
+
+    <!-- Étape 3 : Messages prêts -->
+    <div id="newStep3" style="display:none;">
+      <div class="card">
+        <div class="ct" id="newMsgLabel">Message à envoyer</div>
+        <div class="msg-prev" id="newMsgTicket"></div>
+        <button class="btn bout bf" id="btnCopyTicket" onclick="copyNewMsg('ticket')">Copier le message</button>
+      </div>
+      <div class="card">
+        <div class="ct">Invite au groupe VIP</div>
+        <div class="msg-prev" id="newMsgGroupe"></div>
+        <button class="btn bout bf" id="btnCopyGroupe" onclick="copyNewMsg('groupe')">Copier le message</button>
+      </div>
+      <button class="btn br bf" style="margin-top:6px;" onclick="resetNew()">Nouveau client</button>
+    </div>
+  </div>
+
+  <!-- CLIENTS -->
+  <div class="view" id="vClients">
+    <div class="ph">
+      <div class="ph-row">
+        <div><h1>Clients <span id="cl-badge" style="display:none;font-size:11px;background:var(--or);color:#fff;padding:2px 8px;border-radius:20px;vertical-align:middle;"></span></h1><p id="clients-count">0 client(s)</p></div>
+        <input type="text" id="cl-search" placeholder="Nom ou ticket..." oninput="renderClients()" style="padding:7px 11px;background:var(--surf2);border:1.5px solid var(--bo);border-radius:9px;font-family:inherit;font-size:12px;outline:none;width:140px;color:var(--tx);">
+      </div>
+    </div>
+    <div class="tabs" style="margin-bottom:10px;">
+      <button class="tab on" onclick="clFilter(this,'all')">Tous</button>
+      <button class="tab" onclick="clFilter(this,'no-avis')">Sans avis</button>
+      <button class="tab" onclick="clFilter(this,'with-avis')">Avec avis</button>
+      <button class="tab" onclick="clFilter(this,'today')">Aujourd'hui</button>
+    </div>
+    <div class="card" id="clientsList"></div>
+  </div>
+
+  <!-- FICHE CLIENT -->
+  <div class="view" id="vFiche">
+    <button class="back-btn" onclick="backToClients()">
+      <i data-lucide="chevron-left" style="width:16px;height:16px;"></i>
+      Retour aux clients
+    </button>
+    <div id="ficheContent"></div>
+  </div>
+
+  <!-- TICKETS -->
+  <div class="view" id="vTickets">
+    <div class="ph">
+      <div class="ph-row">
+        <div><h1>Tickets</h1><p>Import et suivi</p></div>
+        <div style="display:flex;gap:6px;">
+          <button class="btn bg bsm" onclick="openM('mForfaits')">Forfaits</button>
+          <button class="btn br bsm" onclick="openM('mImportTk')">Importer</button>
+        </div>
+      </div>
+    </div>
+    <div class="kpis g2" style="margin-bottom:6px;">
+      <div class="kpi"><div class="kn" style="color:var(--bl)" id="tk-d">0</div><div class="kl">Disponibles</div></div>
+      <div class="kpi"><div class="kn" style="color:var(--tx)" id="tk-t">0</div><div class="kl">Total</div></div>
+    </div>
+    <div class="kpis g2" style="margin-bottom:12px;">
+      <div class="kpi"><div class="kn" style="color:var(--or)" id="tk-off">0</div><div class="kl">Offerts (Promo)</div></div>
+      <div class="kpi"><div class="kn" style="color:var(--ok)" id="tk-ven">0</div><div class="kl">Vendus</div></div>
+    </div>
+    <div class="tabs">
+      <button class="tab on" onclick="tkTab(this,'tk-tdispo')">Disponibles</button>
+      <button class="tab" onclick="tkTab(this,'tk-tofferts')">Offerts</button>
+      <button class="tab" onclick="tkTab(this,'tk-tvendus')">Vendus</button>
+    </div>
+    <div id="tk-tdispo"></div>
+    <div id="tk-tofferts" style="display:none;"></div>
+    <div id="tk-tvendus" style="display:none;"></div>
+  </div>
+
+  <!-- STATS -->
+  <div class="view" id="vStats">
+    <div class="ph"><h1>Statistiques</h1><p id="stats-sub">Devise : FCFA</p></div>
+    <div class="tabs" style="margin-bottom:10px;">
+      <button class="tab on" onclick="stTab(this,'promo')">Offerts</button>
+      <button class="tab" onclick="stTab(this,'ventes')">Vendus</button>
+      <button class="tab" onclick="stTab(this,'stats')">Stats</button>
+    </div>
+    <div id="statsPromo"></div>
+    <div id="statsVentes" style="display:none;"></div>
+    <div id="statsGeneral" style="display:none;"></div>
+  </div>
+
+</div>
+
+<nav class="bnav" id="bnav">
+  <svg class="bn-curve" id="bnCurve" preserveAspectRatio="none" viewBox="0 0 400 26"><path id="bnCurvePath" d="M0,26 L400,26 Z" fill="var(--or)"/></svg>
+  <button class="bn on" data-v="vDash" onclick="nav(this)">
+    <i data-lucide="layout-dashboard" style="width:20px;height:20px;"></i>
+    <span>Dashboard</span>
+  </button>
+  <button class="bn" data-v="vImport" onclick="nav(this)">
+    <i data-lucide="user-plus" style="width:20px;height:20px;"></i>
+    <span>Nouveau</span>
+  </button>
+  <button class="bn" data-v="vClients" onclick="nav(this)">
+    <i data-lucide="users" style="width:20px;height:20px;"></i>
+    <span>Clients</span>
+  </button>
+  <button class="bn" data-v="vTickets" onclick="nav(this)">
+    <i data-lucide="ticket" style="width:20px;height:20px;"></i>
+    <span>Tickets</span>
+  </button>
+  <button class="bn" data-v="vStats" onclick="nav(this)">
+    <i data-lucide="bar-chart-3" style="width:20px;height:20px;"></i>
+    <span>Stats</span>
+  </button>
+</nav>
+</div>
+
+<!-- MODAL IMPORT TICKETS -->
+<div class="overlay" id="mImportTk" onclick="closeM('mImportTk')">
+  <div class="modal" onclick="event.stopPropagation()">
+    <div class="mttl">Importer tickets <button class="mc" onclick="closeM('mImportTk')">×</button></div>
+    <div class="f"><label>Forfait</label>
+      <select id="imp-f"></select>
+    </div>
+    <div class="dz" onclick="document.getElementById('impFile').click()">
+      <p><strong style="color:var(--red)">Clique</strong> ou glisse un fichier CSV/TXT</p>
+      <p style="font-size:11px;margin-top:3px;">Format : CODE,motdepasse</p>
+    </div>
+    <input type="file" id="impFile" accept=".csv,.txt" style="display:none" onchange="importFile(this)">
+    <textarea id="impPaste" placeholder="Ou colle ici :&#10;EVIVI-0001,pass123" style="width:100%;margin-top:9px;padding:9px;background:var(--surf2);border:1.5px solid var(--bo);border-radius:9px;font-family:monospace;font-size:12px;min-height:70px;outline:none;color:var(--tx);resize:vertical;"></textarea>
+    <div id="impAlert" style="margin-top:7px;font-size:12px;font-weight:600;"></div>
+    <div class="r2" style="margin-top:9px;">
+      <button class="btn br bf" onclick="doImport()">Importer</button>
+      <button class="btn bg bf" onclick="closeM('mImportTk')">Annuler</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL MESSAGES CLIENT -->
+<div class="overlay" id="mMsgs" onclick="closeM('mMsgs')">
+  <div class="modal" onclick="event.stopPropagation()">
+    <div class="mttl"><span id="mMsgs-title">Messages</span><button class="mc" onclick="closeM('mMsgs')">×</button></div>
+    <div class="tabs">
+      <button class="tab on" onclick="msgTab(this,'mm-ticket')">Accès</button>
+      <button class="tab" onclick="msgTab(this,'mm-groupe')">Groupe</button>
+      <button class="tab" onclick="msgTab(this,'mm-avis')">Avis</button>
+      <button class="tab" onclick="msgTab(this,'mm-merci')">Merci</button>
+    </div>
+    <div id="mm-ticket"><div class="msg-prev" id="mm-ticket-txt"></div><button class="btn bout bf" onclick="copyModalMsg('ticket')">Copier</button></div>
+    <div id="mm-groupe" style="display:none;"><div class="msg-prev" id="mm-groupe-txt"></div><button class="btn bout bf" onclick="copyModalMsg('groupe')">Copier</button></div>
+    <div id="mm-avis" style="display:none;"><div class="msg-prev" id="mm-avis-txt"></div><button class="btn bout bf" onclick="copyModalMsg('avis')">Copier</button></div>
+    <div id="mm-merci" style="display:none;"><div class="msg-prev" id="mm-merci-txt"></div><button class="btn bout bf" onclick="copyModalMsg('merci')">Copier</button></div>
+  </div>
+</div>
+
+<!-- MODAL SAUVEGARDE -->
+<div class="overlay" id="mBackup" onclick="closeM('mBackup')">
+  <div class="modal" onclick="event.stopPropagation()">
+    <div class="mttl">Sauvegarde <button class="mc" onclick="closeM('mBackup')">×</button></div>
+    <div class="card">
+      <div class="ct">Exporter</div>
+      <p style="font-size:12.5px;color:var(--mu);line-height:1.6;margin-bottom:12px;">Fais une sauvegarde régulièrement pour ne rien perdre.</p>
+      <div style="display:flex;flex-direction:column;gap:8px;">
+        <button class="btn br bf" onclick="exportBackup()">Sauvegarde complète (.json)</button>
+        <button class="btn bout bf" onclick="exportCSV()">Exporter clients (.csv)</button>
+      </div>
+    </div>
+    <div class="card">
+      <div class="ct">Restaurer</div>
+      <p style="font-size:12.5px;color:var(--mu);line-height:1.6;margin-bottom:10px;">Importe une sauvegarde .json. Les tickets déjà utilisés restent intacts.</p>
+      <div class="dz" onclick="document.getElementById('restoreFile').click()">
+        <p><strong style="color:var(--red)">Clique</strong> pour importer une sauvegarde .json</p>
+      </div>
+      <input type="file" id="restoreFile" accept=".json" style="display:none" onchange="restoreBackup(this)">
+      <div id="restoreAlert" style="margin-top:8px;font-size:12px;font-weight:600;"></div>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL ATTRIBUER TICKET (fiche client) -->
+<div class="overlay" id="mAssign" onclick="closeM('mAssign')">
+  <div class="modal" onclick="event.stopPropagation()">
+    <div class="mttl"><span id="mAssign-title">Attribuer un ticket</span><button class="mc" onclick="closeM('mAssign')">×</button></div>
+    <input type="hidden" id="assign-cid">
+    <input type="hidden" id="assign-type">
+    <div class="tabs" style="margin-bottom:10px;">
+      <button class="tab on" id="maOff" onclick="assignTab('offrir')">Offrir</button>
+      <button class="tab" id="maVen" onclick="assignTab('vendre')">Vendre</button>
+    </div>
+    <div class="f"><label>Forfait</label><select id="assign-forfait"></select></div>
+    <div id="assignAlert" style="margin-bottom:8px;font-size:12px;font-weight:600;"></div>
+    <button class="btn br bf" onclick="doAssignTicket()">Attribuer</button>
+  </div>
+</div>
+
+<!-- MODAL FORFAITS -->
+<div class="overlay" id="mForfaits" onclick="closeM('mForfaits')">
+  <div class="modal" onclick="event.stopPropagation()">
+    <div class="mttl">Forfaits <button class="mc" onclick="closeM('mForfaits')">×</button></div>
+    <div id="forfaitsList"></div>
+    <button class="btn br bf" style="margin-top:10px;" onclick="openForfaitEdit(null)">Ajouter un forfait</button>
+  </div>
+</div>
+
+<!-- MODAL EDIT FORFAIT -->
+<div class="overlay" id="mForfaitEdit" onclick="closeM('mForfaitEdit')">
+  <div class="modal" onclick="event.stopPropagation()">
+    <div class="mttl"><span id="mfe-title">Nouveau forfait</span><button class="mc" onclick="closeM('mForfaitEdit')">×</button></div>
+    <input type="hidden" id="fe-id">
+    <div class="f"><label>Nom du forfait</label><input type="text" id="fe-name" placeholder="Ex : Forfait 1H"></div>
+    <div class="r3">
+      <div class="f"><label>Catégorie</label>
+        <select id="fe-cat">
+          <option value="Promo">Promo</option>
+          <option value="Heures">Heures</option>
+          <option value="Jours">Jours</option>
+          <option value="Pack">Pack</option>
+        </select>
+      </div>
+      <div class="f"><label>Prix (FCFA)</label><input type="number" id="fe-price" placeholder="0" min="0"></div>
+      <div class="f"><label>Validité</label><input type="text" id="fe-validite" placeholder="Ex: 12H, 7 jours"></div>
+    </div>
+    <div id="feAlert" style="margin-bottom:8px;font-size:12px;font-weight:600;"></div>
+    <div class="r2">
+      <button class="btn br bf" onclick="saveForfait()">Enregistrer</button>
+      <button class="btn bg bf" onclick="closeM('mForfaitEdit')">Annuler</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+(function(){function v(){document.documentElement.style.setProperty('--vh',window.innerHeight*.01+'px');}v();window.addEventListener('resize',v);})();
+function ls(k,d){try{var v=localStorage.getItem('evg2_'+k);return v!=null?JSON.parse(v):d;}catch(e){return d;}}
+function ss(k,v){try{localStorage.setItem('evg2_'+k,JSON.stringify(v));}catch(e){}}
+// Migration: ensure client.tickets is array
+function migrateData(){
+  D.clients=D.clients.map(function(c){
+    if(!c.tickets){c.tickets=c.ticketCode?[c.ticketCode]:[];}
+    return c;
+  });
+  D.tickets=D.tickets.map(function(t){
+    if(!t.type)t.type=getForfaitCat(t.forfait)==='Promo'?'offert':'vendu';
+    if(t.price==null)t.price=t.type==='offert'?0:getForfaitPrice(t.forfait);
+    return t;
+  });
+  ss('clients',D.clients);ss('tickets',D.tickets);
+}
+var D={
+  tickets:ls('tickets',[]),
+  clients:ls('clients',[]),
+  forfaits:ls('forfaits',[
+    {id:1,name:'EVIVI',cat:'Promo',price:0,validite:'3 jours'},
+    {id:2,name:'1H',cat:'Heures',price:100,validite:'12H'},
+    {id:3,name:'3H',cat:'Heures',price:150,validite:'24H'},
+    {id:4,name:'6H',cat:'Heures',price:250,validite:'72H'},
+    {id:5,name:'12H',cat:'Heures',price:450,validite:'7 jours'},
+    {id:6,name:'3J',cat:'Jours',price:850,validite:'3 jours'},
+    {id:7,name:'7J',cat:'Jours',price:1500,validite:'7 jours'},
+    {id:8,name:'15J',cat:'Jours',price:2500,validite:'15 jours'},
+    {id:9,name:'30J',cat:'Jours',price:4000,validite:'30 jours'},
+    {id:10,name:'Pack Étudiant',cat:'Pack',price:2000,validite:'7 jours'},
+    {id:11,name:'Pack Famille',cat:'Pack',price:6000,validite:'30 jours'}
+  ]),
+  cfg:ls('cfg',{
+    lien:'https://chat.whatsapp.com/EgpLaTUQVDQ4MPlzxwrlnI',
+    tplOffert:'Bonjour {prenom} !\n\nTu bénéficies d\'un accès WiFi EVIVI gratuit !\n\nForfait : {forfait}\nPrix : Gratuit\n{validite}\n\nIdentifiant : {code}\nMot de passe : {motdepasse}\n\nComment te connecter :\n1. Connecte-toi au WiFi EVIVI\n2. Le portail s\'ouvre automatiquement\n3. Clique "Se connecter avec mon ticket"\n4. Entre ton identifiant et mot de passe\n\nBonne navigation !\nSupport EVIVI\n01 60 15 21 21',
+    tplVente:'Bonjour {prenom} !\n\nTon accès WiFi EVIVI est activé.\n\nForfait : {forfait}\nPrix : {prix} FCFA\n{validite}\n\nIdentifiant : {code}\nMot de passe : {motdepasse}\n\nComment te connecter :\n1. Connecte-toi au WiFi EVIVI\n2. Le portail s\'ouvre automatiquement\n3. Clique "Se connecter avec mon ticket"\n4. Entre ton identifiant et mot de passe\n\nMerci pour ton achat !\nSupport EVIVI\n01 60 15 21 21',
+    tplFidelite:'Bonjour {prenom} !\n\nMerci pour ta fidélité ! Tu as effectué 3 achats chez EVIVI et on t\'offre un accès gratuit en récompense.\n\nForfait : {forfait}\nPrix : Gratuit\n{validite}\n\nIdentifiant : {code}\nMot de passe : {motdepasse}\n\nComment te connecter :\n1. Connecte-toi au WiFi EVIVI\n2. Le portail s\'ouvre automatiquement\n3. Clique "Se connecter avec mon ticket"\n4. Entre ton identifiant et mot de passe\n\nBonne navigation !\nSupport EVIVI\n01 60 15 21 21',
+    tplGroupe:'Bonjour {prenom} !\n\nMerci de faire partie de nos clients EVIVI.\n\nRejoins notre groupe VIP pour recevoir toutes nos offres en avant-première :\n{lien}\n\nDans ce groupe tu trouveras :\n• Nos nouvelles offres et promotions\n• Les mises à jour du service\n• Un espace pour partager ton avis\n\nOn t\'y attend !\nEVIVI',
+    tplAvis:'Bonjour {prenom} !\n\nOn espère que tu profites bien de ta connexion EVIVI.\n\nTon avis compte énormément pour nous. Quand tu te déconnectes, clique sur "Donner mon avis" pour nous faire ton retour.\n\nMerci pour ta confiance !\nSupport EVIVI\n01 60 15 21 21',
+    tplMerci:'Bonjour {prenom} !\n\nMerci d\'avoir fait confiance à EVIVI.\n\nReste connecté à notre communauté :\n{lien}\n\nÀ très bientôt !\nEVIVI'
+  }),
+};
+var curClientId=null;
+var TITLES={vDash:'Dashboard',vImport:'Nouveau client',vClients:'Clients',vFiche:'Fiche client',vTickets:'Tickets',vStats:'Statistiques'};
+function nav(btn){
+  var id=btn.getAttribute('data-v');
+  showView(id);
+  document.querySelectorAll('.bn').forEach(function(b){b.classList.toggle('on',b===btn);});
+  moveBubble(btn);
+}
+function moveBubble(btn){
+  var path=document.getElementById('bnCurvePath');
+  if(!path||!btn)return;
+  var nav=document.getElementById('bnav');
+  var w=nav.offsetWidth;
+  var btnRect=btn.getBoundingClientRect();
+  var navRect=nav.getBoundingClientRect();
+  var cx=(btnRect.left-navRect.left+btnRect.width/2)/w*400;
+  var r=45;
+  var h=24;
+  var d='M0,'+h+' L'+(cx-r*2)+','+h+' C'+(cx-r)+','+h+' '+(cx-r*.6)+',0 '+cx+',0 C'+(cx+r*.6)+',0 '+(cx+r)+','+h+' '+(cx+r*2)+','+h+' L400,'+h+' L400,'+h+' L0,'+h+' Z';
+  path.setAttribute('d',d);
+}
+function showView(id){
+  document.querySelectorAll('.view').forEach(function(v){v.className='view'+(v.id===id?' show':'');});
+  document.getElementById('topTitle').textContent=TITLES[id]||id;
+  document.getElementById('content').scrollTo(0,0);
+  if(id==='vDash')renderDash();
+  else if(id==='vClients')renderClients();
+  else if(id==='vTickets')renderTickets();
+  else if(id==='vStats')renderStats();
+  setTimeout(function(){if(window.lucide)lucide.createIcons();},50);
+}
+function backToClients(){
+  showView('vClients');
+  document.querySelectorAll('.bn').forEach(function(b){b.classList.toggle('on',b.getAttribute('data-v')==='vClients');});
+}
+function openM(id){document.getElementById(id).classList.add('show');if(id==='mForfaits')renderForfaitsList();}
+function closeM(id){document.getElementById(id).classList.remove('show');}
+function toast(m){var e=document.getElementById('toast');e.textContent=m;e.classList.add('show');clearTimeout(e._t);e._t=setTimeout(function(){e.classList.remove('show');},2500);}
+function isToday(ts){var d=new Date(ts||0),n=new Date();return d.getDate()===n.getDate()&&d.getMonth()===n.getMonth();}
+function tStr(ts){return new Date(ts).toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'});}
+function dStr(ts){return new Date(ts).toLocaleDateString('fr-FR',{day:'numeric',month:'short'});}
+function copyText(txt,btn){
+  function done(){if(btn){var o=btn.textContent;btn.textContent='Copié !';setTimeout(function(){btn.textContent=o;},2000);}}
+  if(navigator.clipboard){navigator.clipboard.writeText(txt).then(done).catch(function(){fb();done();});}else{fb();done();}
+  function fb(){var el=document.createElement('textarea');el.value=txt;el.style.cssText='position:fixed;opacity:0;';document.body.appendChild(el);el.select();try{document.execCommand('copy');}catch(e){}document.body.removeChild(el);}
+}
+function buildMsg(tpl,c,tk){return(tpl||'').replace(/{prenom}/g,c.prenom||'').replace(/{nom}/g,c.nom||'').replace(/{code}/g,(tk?tk.code:'')||'—').replace(/{motdepasse}/g,(tk?tk.pass:'')||'—').replace(/{forfait}/g,(tk?tk.forfait:'')||'—').replace(/{prix}/g,(tk?tk.price:0)||'0').replace(/{validite}/g,tk?formatValiditeMsg(tk.forfait):'').replace(/{lien}/g,D.cfg.lien||'');}
+function setA(id,msg,type){var e=document.getElementById(id);if(e){e.textContent=msg;e.style.color=type==='ok'?'var(--ok)':'#c00';}}
+
+// DASHBOARD
+function renderDash(){
+  var days=['Dimanche','Lundi','Mardi','Mercredi','Jeudi','Vendredi','Samedi'];
+  var months=['janv.','févr.','mars','avr.','mai','juin','juil.','août','sept.','oct.','nov.','déc.'];
+  var d=new Date();
+  document.getElementById('dashDate').textContent=days[d.getDay()]+' '+d.getDate()+' '+months[d.getMonth()]+' '+d.getFullYear();
+  document.getElementById('dk-dispo').textContent=D.tickets.filter(function(t){return t.status==='dispo';}).length;
+  document.getElementById('dk-actif').textContent=D.tickets.filter(function(t){return t.status==='actif';}).length;
+  document.getElementById('dk-clients').textContent=D.clients.length;
+  document.getElementById('dk-today').textContent=D.clients.filter(function(c){return isToday(c.ts);}).length;
+  // Revenus (exclure promos)
+  var revenue=0;
+  D.tickets.filter(function(t){return t.status==='actif'||t.status==='used';}).forEach(function(t){
+    var cat=getForfaitCat(t.forfait);
+    if(cat!=='Promo')revenue+=getForfaitPrice(t.forfait);
+  });
+  document.getElementById('dk-revenue').textContent=revenue.toLocaleString('fr-FR');
+  var noAvis=D.clients.filter(function(c){return!c.avis;}).length;
+  document.getElementById('dk-noavis').textContent=noAvis;
+  var actsEl=document.getElementById('dashActs');
+  actsEl.innerHTML=D.clients.slice(0,5).map(function(c){
+    return'<div class="cl-item" onclick="openFiche('+c.id+')">'
+      +'<div class="cl-av">'+c.prenom.charAt(0).toUpperCase()+'</div>'
+      +'<div style="flex:1;min-width:0;"><div class="cl-name">'+c.prenom+' '+c.nom+'</div><div class="cl-meta">'+(c.ticketCode||'—')+' · '+dStr(c.ts)+'</div></div>'
+      +'<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--mu)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>'
+      +'</div>';
+  }).join('')||'<div class="empty"><div class="empty-s">Aucun client enregistré</div></div>';
+  var bars=[];
+  for(var i=6;i>=0;i--){var dd=new Date();dd.setDate(dd.getDate()-i);var v=D.clients.filter(function(c){var cd=new Date(c.ts||0);return cd.getDate()===dd.getDate()&&cd.getMonth()===dd.getMonth();}).length;bars.push({v:v,l:['D','L','M','M','J','V','S'][dd.getDay()]});}
+  var mx=Math.max(1,Math.max.apply(null,bars.map(function(b){return b.v;})));
+  document.getElementById('dashChart').innerHTML=bars.map(function(b){var h=Math.round(b.v/mx*60)+4;return'<div class="cb"><div class="cb-fill" style="height:'+h+'px"></div><div class="cb-lbl">'+b.l+'</div></div>';}).join('');
+  // Forfaits
+  var fMap={};D.tickets.filter(function(t){return t.status==='actif';}).forEach(function(t){var f=t.forfait||'?';fMap[f]=(fMap[f]||0)+1;});
+  var fData=Object.entries(fMap).sort(function(a,b){return b[1]-a[1];});
+  var fTotal=D.tickets.filter(function(t){return t.status==='actif';}).length||1;
+  document.getElementById('dashForfaits').innerHTML=fData.length?fData.map(function(f){var pct=Math.round(f[1]/fTotal*100);return'<div class="sb-row"><div class="sb-lbl">'+f[0]+'</div><div class="sb-track"><div class="sb-fill" style="width:'+pct+'%"></div></div><div class="sb-val">'+f[1]+'</div></div>';}).join(''):'<div style="font-size:12px;color:var(--mu);text-align:center;padding:10px;">Aucun ticket attribué</div>';
+  // Logs
+  var logs=ls('logs',[]).slice(0,8);
+  document.getElementById('dashLogs').innerHTML=logs.length?logs.map(function(l){return'<div style="display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid var(--bo);font-size:12px;"><span style="color:var(--tx);font-weight:600;">'+l.msg+'</span><span style="color:var(--mu);font-size:10px;flex-shrink:0;margin-left:8px;">'+tStr(l.ts)+'</span></div>';}).join(''):'<div style="font-size:12px;color:var(--mu);text-align:center;padding:10px;">Aucune activité</div>';
+  checkBackupReminder();
+}
+
+// PARSE
+var newClientId=null;
+var newType='offrir';
+function saveClient(){
+  var prenom=document.getElementById('f-prenom').value.trim();
+  if(!prenom){setA('saveAlert','Prénom requis.','err');return;}
+  var nom=document.getElementById('f-nom').value.trim();
+  if(!nom){setA('saveAlert','Nom requis.','err');return;}
+  var now=Date.now();
+  var c={id:now,ts:now,prenom:prenom,nom:nom,avis:'',situation:'',usage:'',budget:'',priorite:'',tickets:[]};
+  D.clients.unshift(c);ss('clients',D.clients);
+  newClientId=now;
+  addLog(prenom+' '+nom+' enregistré');
+  toast('Client '+prenom+' '+nom+' enregistré');
+  document.getElementById('newStep1').style.display='none';
+  document.getElementById('newStep2').style.display='block';
+  document.getElementById('newConfirm').textContent=prenom+' '+nom+' enregistré !';
+  newType='offrir';
+  renderNewForfaitSelect();
+  newTypeTab('offrir');
+  renderDash();
+}
+function newTypeTab(type){
+  newType=type;
+  document.getElementById('ntOff').className=type==='offrir'?'tab on':'tab';
+  document.getElementById('ntVen').className=type==='vendre'?'tab on':'tab';
+  document.getElementById('newTypeLabel').textContent=type==='offrir'?'Offrir un accès gratuit':'Vendre un accès';
+  renderNewForfaitSelect();
+}
+function renderNewForfaitSelect(){
+  var sel=document.getElementById('new-forfait');
+  var html='<option value="">-- Choisir --</option>';
+  D.forfaits.forEach(function(f){
+    if(newType==='offrir'){
+      html+='<option value="'+f.name+'">'+f.name+(f.cat==='Promo'?' — Gratuit':' — Offert')+'</option>';
+    } else {
+      if(f.cat==='Promo')return;
+      html+='<option value="'+f.name+'">'+f.name+' — '+f.price+' FCFA</option>';
+    }
+  });
+  sel.innerHTML=html;
+}
+function assignTicketNew(){
+  var forfaitName=document.getElementById('new-forfait').value;
+  if(!forfaitName){setA('newAssignAlert','Choisis un forfait.','err');return;}
+  var c=D.clients.find(function(x){return x.id===newClientId;});
+  if(!c){setA('newAssignAlert','Client introuvable.','err');return;}
+  var dispo=D.tickets.filter(function(t){return t.status==='dispo'&&t.forfait===forfaitName;});
+  if(!dispo.length){setA('newAssignAlert','Aucun ticket disponible pour '+forfaitName+'. Importe des tickets de ce forfait.','err');return;}
+  var ticket=dispo[0];
+  var price=newType==='offrir'?0:getForfaitPrice(forfaitName);
+  var type=newType==='offrir'?'offert':'vendu';
+  ticket.status='actif';ticket.owner=c.prenom+' '+c.nom;ticket.usedAt=Date.now();ticket.type=type;ticket.price=price;ticket.forfait=forfaitName;
+  c.tickets.push(ticket.code);
+  ss('tickets',D.tickets);ss('clients',D.clients);
+  // Messages
+  var tpl=type==='fidelite'?D.cfg.tplFidelite:(type==='offert'?D.cfg.tplOffert:D.cfg.tplVente);
+  document.getElementById('newMsgTicket').textContent=buildMsg(tpl,c,ticket);
+  document.getElementById('newMsgGroupe').textContent=buildMsg(D.cfg.tplGroupe,c,ticket);
+  document.getElementById('newMsgLabel').textContent=type==='fidelite'?'Ticket fidélité offert !':type==='offert'?'Ticket offert':'Ticket vendu — '+price+' FCFA';
+  document.getElementById('newStep2').style.display='none';
+  document.getElementById('newStep3').style.display='block';
+  addLog(c.prenom+' '+c.nom+' — '+ticket.code+' ('+type+')');
+  toast(ticket.code+' attribué');
+  renderDash();renderTickets();
+}
+function copyNewMsg(type){
+  var el=document.getElementById(type==='ticket'?'newMsgTicket':'newMsgGroupe');
+  var btn=document.getElementById(type==='ticket'?'btnCopyTicket':'btnCopyGroupe');
+  copyText(el.textContent,btn);
+}
+function resetNew(){
+  document.getElementById('newStep1').style.display='block';
+  document.getElementById('newStep2').style.display='none';
+  document.getElementById('newStep3').style.display='none';
+  document.getElementById('f-prenom').value='';
+  document.getElementById('f-nom').value='';
+  document.getElementById('f-paste').value='';
+  document.getElementById('saveAlert').textContent='';
+  newClientId=null;
+}
+function clientPurchaseCount(c){
+  return(c.tickets||[]).filter(function(code){
+    var t=D.tickets.find(function(x){return x.code===code;});
+    return t&&t.type==='vendu';
+  }).length;
+}
+// Compte les achats d'un forfait spécifique (sans compter les fidélités)
+function clientPurchaseCountByForfait(c,forfaitName){
+  return(c.tickets||[]).filter(function(code){
+    var t=D.tickets.find(function(x){return x.code===code;});
+    return t&&t.type==='vendu'&&t.forfait===forfaitName;
+  }).length;
+}
+// Vérifie si un client a droit à un ticket fidélité pour un forfait donné
+function clientFideliteEligible(c){
+  var counts={};
+  (c.tickets||[]).forEach(function(code){
+    var t=D.tickets.find(function(x){return x.code===code;});
+    if(t&&t.type==='vendu'){counts[t.forfait]=(counts[t.forfait]||0)+1;}
+  });
+  // Compter les fidélités déjà offertes par forfait
+  var fidelites={};
+  (c.tickets||[]).forEach(function(code){
+    var t=D.tickets.find(function(x){return x.code===code;});
+    if(t&&t.type==='fidelite'){fidelites[t.forfait]=(fidelites[t.forfait]||0)+1;}
+  });
+  // Pour chaque forfait, vérifier si achats >= 3 * (fidelites+1)
+  var eligible=[];
+  Object.keys(counts).forEach(function(f){
+    var earned=Math.floor(counts[f]/3);
+    var given=fidelites[f]||0;
+    if(earned>given)eligible.push(f);
+  });
+  return eligible;
+}
+
+// CLIENTS LIST
+function renderClients(){
+  var q=(document.getElementById('cl-search').value||'').toLowerCase();
+  // Recherche par nom, situation OU ticket
+  var clients=D.clients.filter(function(c){
+    if(q&&!(c.prenom+' '+c.nom+' '+(c.situation||'')+' '+(c.ticketCode||'')).toLowerCase().includes(q))return false;
+    if(clFilterMode==='no-avis')return!c.avis;
+    if(clFilterMode==='with-avis')return!!c.avis;
+    if(clFilterMode==='today')return isToday(c.ts);
+    return true;
+  });
+  document.getElementById('clients-count').textContent=clients.length+' client(s)';
+  // Badge avis manquants
+  var noAvis=D.clients.filter(function(c){return!c.avis;}).length;
+  var badge=document.getElementById('cl-badge');
+  if(noAvis>0){badge.style.display='inline';badge.textContent=noAvis+' sans avis';}else{badge.style.display='none';}
+  document.getElementById('clientsList').innerHTML=clients.length
+    ?clients.map(function(c){var avisIcon=c.avis?'<span class="badge bok" style="margin-left:6px;font-size:8px;">Avis</span>':'';return'<div class="cl-item" onclick="openFiche('+c.id+')">'+'<div class="cl-av">'+c.prenom.charAt(0).toUpperCase()+'</div>'+'<div style="flex:1;min-width:0;"><div class="cl-name">'+c.prenom+' '+c.nom+avisIcon+'</div><div class="cl-meta">'+(c.ticketCode||'—')+' · '+(c.situation||'—')+'</div></div>'+'<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--mu)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>'+'</div>';}).join('')
+    :'<div class="empty"><div class="empty-t">Aucun client</div><div class="empty-s">'+(q?'Aucun résultat':'Enregistre ton premier client')+'</div></div>';
+}
+
+// FICHE CLIENT
+function openFiche(id){
+  var c=D.clients.find(function(x){return x.id===id;});
+  if(!c)return;
+  curClientId=id;
+  var tickets=(c.tickets||[]).map(function(code){return D.tickets.find(function(t){return t.code===code;});}).filter(Boolean);
+  var achats=clientPurchaseCount(c);
+  var prochainOffert=achats>0&&achats%3===0;
+  var html='<div class="fiche-header"><div class="fiche-name">'+c.prenom+' '+c.nom+'</div><div class="fiche-sub">Client depuis le '+dStr(c.ts)+'</div>';
+  if(achats>0){html+='<div style="font-size:11px;opacity:.8;margin-top:4px;">Achats : '+achats+(prochainOffert?' — Prochain ticket OFFERT !':' / 3 pour un offert')+'</div>';}
+  html+='</div>';
+  // Bloc fidélité
+  var eligible=clientFideliteEligible(c);
+  if(eligible.length){
+    eligible.forEach(function(forfaitName){
+      var dispoCount=D.tickets.filter(function(t){return t.status==='dispo'&&t.forfait===forfaitName;}).length;
+      html+='<div class="card" style="border-color:var(--or);background:rgba(244,151,57,.05);">'
+        +'<div style="display:flex;align-items:center;gap:10px;">'
+        +'<div style="font-size:24px;">🎁</div>'
+        +'<div style="flex:1;"><div style="font-size:13px;font-weight:800;color:var(--or);">Fidélité — '+forfaitName+'</div>'
+        +'<div style="font-size:11px;color:var(--mu);margin-top:2px;">3 achats atteints ! 1 ticket '+forfaitName+' gratuit à offrir.</div></div>'
+        +'</div>'
+        +(dispoCount?'<button class="btn br bf" style="margin-top:10px;" onclick="offrirFidelite('+id+',\''+forfaitName+'\')">Offrir le ticket fidélité</button>':'<div style="margin-top:8px;font-size:12px;color:#c00;font-weight:600;">Aucun ticket '+forfaitName+' disponible. Importe-en.</div>')
+        +'</div>';
+    });
+  }
+  // Boutons Offrir / Vendre
+  html+='<div class="r2" style="margin-bottom:11px;"><button class="btn br bf" onclick="openAssign('+id+',\'offrir\')">Offrir</button><button class="btn bout bf" onclick="openAssign('+id+',\'vendre\')">Vendre</button></div>';
+  // Historique tickets
+  if(tickets.length){
+    html+='<div class="card"><div class="ct">Historique tickets</div><div class="tbl-wrap"><table class="tbl"><thead><tr><th>Forfait</th><th>Identifiant</th><th>MDP</th><th>Type</th><th>Prix</th></tr></thead><tbody>';
+    tickets.forEach(function(t){
+      var badge=t.type==='vendu'?'bok':(t.type==='fidelite'?'bbl':'bred');
+      var label=t.type==='vendu'?'Vendu':(t.type==='fidelite'?'Fidélité':'Offert');
+      html+='<tr><td style="font-weight:700;">'+t.forfait+'</td><td style="font-family:monospace;">'+t.code+'</td><td style="font-family:monospace;">'+t.pass+'</td><td><span class="badge '+badge+'">'+label+'</span></td><td>'+(t.price?t.price.toLocaleString('fr-FR'):'Gratuit')+'</td></tr>';
+    });
+    html+='</tbody></table></div></div>';
+  }
+  // Section coller avis
+  html+='<div class="card"><div class="ct">Avis reçu par WhatsApp</div>';
+  if(c.avis){
+    html+='<div style="font-size:13px;color:var(--tx);line-height:1.6;font-style:italic;margin-bottom:10px;">"'+c.avis+'"</div>';
+    html+='<div class="info-grid">'+[['Situation',c.situation],['Usage',c.usage],['Budget',c.budget],['Priorité',c.priorite]].map(function(i){return'<div class="info-item"><div class="info-lbl">'+i[0]+'</div><div class="info-val">'+(i[1]||'—')+'</div></div>';}).join('')+'</div>';
+  } else {
+    html+='<div class="f"><textarea id="ficheAvisPaste" rows="5" placeholder="Colle ici le message avis reçu par WhatsApp..."></textarea></div>';
+    html+='<button class="btn br bf" onclick="parseAvis('+id+')">Enregistrer l\'avis</button>';
+    html+='<div id="ficheAvisAlert" style="margin-top:8px;font-size:12px;font-weight:600;"></div>';
+  }
+  html+='</div>';
+
+  html+='<div class="card"><div class="ct">Messages personnalisés</div><div style="display:flex;flex-direction:column;gap:8px;">';
+  [['ticket','Envoyer le ticket d\'accès'],['groupe','Inviter dans le groupe'],['avis','Demander un avis'],['merci','Message de remerciement']].forEach(function(m){html+='<button class="btn bout bf" onclick="openMsgsModal('+id+',\''+m[0]+'\')">'+m[1]+'</button>';});
+  html+='</div></div>';
+  document.getElementById('ficheContent').innerHTML=html;
+  showView('vFiche');
+}
+function openMsgsModal(clientId,tab){
+  var c=D.clients.find(function(x){return x.id===clientId;});
+  if(!c)return;
+  document.getElementById('mMsgs-title').textContent=c.prenom+' '+c.nom;
+  document.getElementById('mm-ticket-txt').textContent=buildMsg(D.cfg.tplTicket,c);
+  document.getElementById('mm-groupe-txt').textContent=buildMsg(D.cfg.tplGroupe,c);
+  document.getElementById('mm-avis-txt').textContent=buildMsg(D.cfg.tplAvis,c);
+  document.getElementById('mm-merci-txt').textContent=buildMsg(D.cfg.tplMerci,c);
+  // Activate correct tab
+  document.querySelectorAll('#mMsgs .tab').forEach(function(b){b.classList.remove('on');});
+  ['mm-ticket','mm-groupe','mm-avis','mm-merci'].forEach(function(v){document.getElementById(v).style.display='none';});
+  var tId='mm-'+tab;
+  document.getElementById(tId).style.display='block';
+  document.querySelectorAll('#mMsgs .tab').forEach(function(b){if(b.getAttribute('onclick').includes("'"+tId+"'"))b.classList.add('on');});
+  openM('mMsgs');
+}
+function copyModalMsg(type){copyText(document.getElementById('mm-'+type+'-txt').textContent);}
+// FIDÉLITÉ — offrir directement
+function offrirFidelite(clientId,forfaitName){
+  var c=D.clients.find(function(x){return x.id===clientId;});
+  if(!c)return;
+  var dispo=D.tickets.filter(function(t){return t.status==='dispo'&&t.forfait===forfaitName;});
+  if(!dispo.length){toast('Aucun ticket '+forfaitName+' disponible');return;}
+  var ticket=dispo[0];
+  ticket.status='actif';ticket.owner=c.prenom+' '+c.nom;ticket.usedAt=Date.now();ticket.type='fidelite';ticket.price=0;ticket.forfait=forfaitName;
+  if(!c.tickets)c.tickets=[];
+  c.tickets.push(ticket.code);
+  ss('tickets',D.tickets);ss('clients',D.clients);
+  addLog(c.prenom+' '+c.nom+' — '+ticket.code+' (fidélité '+forfaitName+')');
+  toast('Ticket fidélité '+forfaitName+' offert !');
+  // Ouvrir modal message
+  document.getElementById('mMsgs-title').textContent=c.prenom+' '+c.nom;
+  document.getElementById('mm-ticket-txt').textContent=buildMsg(D.cfg.tplFidelite,c,ticket);
+  document.getElementById('mm-groupe-txt').textContent=buildMsg(D.cfg.tplGroupe,c,ticket);
+  document.getElementById('mm-avis-txt').textContent=buildMsg(D.cfg.tplAvis,c,ticket);
+  document.getElementById('mm-merci-txt').textContent=buildMsg(D.cfg.tplMerci,c,ticket);
+  msgTab(document.querySelector('#mMsgs .tab'),'mm-ticket');
+  openM('mMsgs');
+  renderDash();renderTickets();
+  setTimeout(function(){openFiche(clientId);},300);
+}
+
+// ASSIGN TICKET (fiche client)
+function openAssign(clientId,type){
+  document.getElementById('assign-cid').value=clientId;
+  document.getElementById('assign-type').value=type;
+  document.getElementById('assignAlert').textContent='';
+  assignTab(type);
+  openM('mAssign');
+}
+function assignTab(type){
+  document.getElementById('assign-type').value=type;
+  document.getElementById('maOff').className=type==='offrir'?'tab on':'tab';
+  document.getElementById('maVen').className=type==='vendre'?'tab on':'tab';
+  var sel=document.getElementById('assign-forfait');
+  var html='<option value="">-- Choisir --</option>';
+  D.forfaits.forEach(function(f){
+    if(type==='offrir'){
+      html+='<option value="'+f.name+'">'+f.name+(f.cat==='Promo'?' — Gratuit':' — Offert')+'</option>';
+    } else {
+      if(f.cat==='Promo')return;
+      html+='<option value="'+f.name+'">'+f.name+' — '+f.price+' FCFA</option>';
+    }
+  });
+  sel.innerHTML=html;
+}
+function doAssignTicket(){
+  var clientId=parseInt(document.getElementById('assign-cid').value);
+  var type=document.getElementById('assign-type').value;
+  var forfaitName=document.getElementById('assign-forfait').value;
+  if(!forfaitName){setA('assignAlert','Choisis un forfait.','err');return;}
+  var c=D.clients.find(function(x){return x.id===clientId;});
+  if(!c)return;
+  var dispo=D.tickets.filter(function(t){return t.status==='dispo'&&t.forfait===forfaitName;});
+  if(!dispo.length){setA('assignAlert','Aucun ticket disponible pour '+forfaitName+'. Importe des tickets de ce forfait.','err');return;}
+  var ticket=dispo[0];
+  var price=type==='offrir'?0:getForfaitPrice(forfaitName);
+  var tkType=type==='offrir'?'offert':'vendu';
+  ticket.status='actif';ticket.owner=c.prenom+' '+c.nom;ticket.usedAt=Date.now();ticket.type=tkType;ticket.price=price;ticket.forfait=forfaitName;
+  if(!c.tickets)c.tickets=[];
+  c.tickets.push(ticket.code);
+  ss('tickets',D.tickets);ss('clients',D.clients);
+  var tpl=tkType==='fidelite'?D.cfg.tplFidelite:(tkType==='offert'?D.cfg.tplOffert:D.cfg.tplVente);
+  addLog(c.prenom+' '+c.nom+' — '+ticket.code+' ('+tkType+')');
+  toast(ticket.code+' attribué — '+(tkType==='fidelite'?'Fidélité !':tkType==='offert'?'Offert':price+' FCFA'));
+  closeM('mAssign');
+  // Ouvrir modal message
+  document.getElementById('mMsgs-title').textContent=c.prenom+' '+c.nom;
+  document.getElementById('mm-ticket-txt').textContent=buildMsg(tpl,c,ticket);
+  document.getElementById('mm-groupe-txt').textContent=buildMsg(D.cfg.tplGroupe,c,ticket);
+  document.getElementById('mm-avis-txt').textContent=buildMsg(D.cfg.tplAvis,c,ticket);
+  document.getElementById('mm-merci-txt').textContent=buildMsg(D.cfg.tplMerci,c,ticket);
+  msgTab(document.querySelector('#mMsgs .tab'),'mm-ticket');
+  openM('mMsgs');
+  renderDash();renderTickets();
+  setTimeout(function(){openFiche(clientId);},300);
+}
+function parseAvis(clientId){
+  var raw=(document.getElementById('ficheAvisPaste')||{}).value;
+  if(!raw||!raw.trim()){setA('ficheAvisAlert','Colle un message avant d\'enregistrer.','err');return;}
+  raw=raw.trim();
+  var mAvis=raw.match(/Mon avis\s*:\s*(.+)/i)||raw.match(/avis\s*[:：]\s*(.+)/im);
+  var mSit=raw.match(/Je suis\s+(.+?),/i)||raw.match(/situation\s*[:：]\s*(.+)/im);
+  var mUsage=raw.match(/j'utilise surtout (?:Internet|internet) pour\s+(.+?)\./i)||raw.match(/usage\s*(?:principal)?\s*[:：]\s*(.+)/im);
+  var mBudget=raw.match(/budget par semaine c'est\s+(.+?)\s+et/i)||raw.match(/budget\s*(?:\/\s*semaine)?\s*[:：]\s*(.+)/im);
+  var mPrio=raw.match(/ce qui compte le plus pour moi c'est\s+(.+?)\./i)||raw.match(/priorit[eé]s?\s*[:：]\s*(.+)/im);
+  D.clients=D.clients.map(function(c){
+    if(c.id===clientId){
+      c.avis=mAvis?mAvis[1].trim():'';
+      c.situation=mSit?mSit[1].trim():'';
+      c.usage=mUsage?mUsage[1].trim():'';
+      c.budget=mBudget?mBudget[1].trim():'';
+      c.priorite=mPrio?mPrio[1].trim():'';
+    }
+    return c;
+  });
+  ss('clients',D.clients);
+  var cl=D.clients.find(function(x){return x.id===clientId;});
+  addLog((cl?cl.prenom+' '+cl.nom:'Client')+' — Avis enregistré');
+  toast('Avis enregistré !');
+  openFiche(clientId);
+}
+function msgTab(btn,id){
+  document.querySelectorAll('#mMsgs .tab').forEach(function(b){b.classList.remove('on');});
+  btn.classList.add('on');
+  ['mm-ticket','mm-groupe','mm-avis','mm-merci'].forEach(function(v){document.getElementById(v).style.display=v===id?'block':'none';});
+}
+
+// TICKETS
+function renderTickets(){
+  var dispo=D.tickets.filter(function(t){return t.status==='dispo';});
+  var used=D.tickets.filter(function(t){return t.status!=='dispo';});
+  var offerts=used.filter(function(t){return getForfaitCat(t.forfait)==='Promo';});
+  var vendus=used.filter(function(t){return getForfaitCat(t.forfait)!=='Promo';});
+  document.getElementById('tk-d').textContent=dispo.length;
+  document.getElementById('tk-t').textContent=D.tickets.length;
+  document.getElementById('tk-off').textContent=offerts.length;
+  document.getElementById('tk-ven').textContent=vendus.length;
+  // Disponibles
+  document.getElementById('tk-tdispo').innerHTML=dispo.length?'<div class="card"><div class="tbl-wrap"><table class="tbl"><thead><tr><th>Code</th><th>Mot de passe</th><th>Forfait</th></tr></thead><tbody>'+dispo.map(function(t){return'<tr><td style="font-family:monospace;font-weight:700;">'+t.code+'</td><td style="font-family:monospace;">'+t.pass+'</td><td>'+t.forfait+'</td></tr>';}).join('')+'</tbody></table></div></div>':'<div class="empty"><div class="empty-t">Aucun ticket disponible</div><div class="empty-s">Importe des tickets depuis Mikhmon</div></div>';
+  // Offerts (promo)
+  document.getElementById('tk-tofferts').innerHTML=offerts.length?'<div class="card"><div class="tbl-wrap"><table class="tbl"><thead><tr><th>Code</th><th>Client</th><th>Forfait</th></tr></thead><tbody>'+offerts.map(function(t){return'<tr><td style="font-family:monospace;font-weight:700;">'+t.code+'</td><td>'+(t.owner||'—')+'</td><td>'+t.forfait+'</td></tr>';}).join('')+'</tbody></table></div></div>':'<div class="empty"><div class="empty-t">Aucun ticket offert</div></div>';
+  // Vendus
+  document.getElementById('tk-tvendus').innerHTML=vendus.length?'<div class="card"><div class="tbl-wrap"><table class="tbl"><thead><tr><th>Code</th><th>Client</th><th>Forfait</th><th>Prix</th></tr></thead><tbody>'+vendus.map(function(t){return'<tr><td style="font-family:monospace;font-weight:700;">'+t.code+'</td><td>'+(t.owner||'—')+'</td><td>'+t.forfait+'</td><td style="font-weight:700;color:var(--ok);">'+(t.price||getForfaitPrice(t.forfait))+'</td></tr>';}).join('')+'</tbody></table></div></div>':'<div class="empty"><div class="empty-t">Aucune vente</div></div>';
+}
+function tkTab(btn,id){document.querySelectorAll('#vTickets .tab').forEach(function(b){b.classList.remove('on');});btn.classList.add('on');['tk-tdispo','tk-tofferts','tk-tvendus'].forEach(function(v){document.getElementById(v).style.display=v===id?'block':'none';});}
+function importFile(input){var f=input.files[0];if(!f)return;var r=new FileReader();r.onload=function(e){document.getElementById('impPaste').value=e.target.result;};r.readAsText(f);input.value='';}
+function doImport(){
+  var fName=document.getElementById('imp-f').value;
+  if(!fName){setImpA('Sélectionne un forfait.','err');return;}
+  var txt=document.getElementById('impPaste').value.trim();
+  if(!txt){setImpA('Importe ou colle des tickets.','err');return;}
+  var existing=D.tickets.map(function(t){return t.code;});
+  var added=0,skip=0;
+  txt.split('\n').forEach(function(line){line=line.trim();if(!line)return;var parts=line.split(/[,;\t ]+/);if(parts.length<2)return;var code=parts[0].trim(),pass=parts[1].trim();if(!code||!pass)return;if(existing.includes(code)){skip++;return;}D.tickets.push({id:Date.now()+Math.random(),ts:Date.now(),code:code,pass:pass,status:'dispo',forfait:fName,owner:'',usedAt:null});existing.push(code);added++;});
+  ss('tickets',D.tickets);
+  addLog(added+' ticket(s) importé(s) — '+fName);
+  setImpA(added+' importé(s).'+(skip?' '+skip+' doublon(s).':''),'ok');
+  setTimeout(function(){closeM('mImportTk');document.getElementById('impPaste').value='';renderTickets();renderDash();},1500);
+}
+function setImpA(msg,t){var e=document.getElementById('impAlert');e.textContent=msg;e.style.color=t==='ok'?'var(--ok)':'#c00';}
+
+// STATS
+var stMode='promo';
+function stTab(btn,mode){
+  stMode=mode;
+  document.querySelectorAll('#vStats .tab').forEach(function(b){b.classList.remove('on');});
+  btn.classList.add('on');
+  document.getElementById('statsPromo').style.display=mode==='promo'?'block':'none';
+  document.getElementById('statsVentes').style.display=mode==='ventes'?'block':'none';
+  document.getElementById('statsGeneral').style.display=mode==='stats'?'block':'none';
+}
+function renderStats(){
+  document.getElementById('stats-sub').textContent='Devise : FCFA';
+  var tkUsed=D.tickets.filter(function(t){return t.status!=='dispo';});
+  var tkOfferts=tkUsed.filter(function(t){return t.type==='offert'||t.type==='fidelite';});
+  var tkVendus=tkUsed.filter(function(t){return t.type==='vendu';});
+
+  function barChart(data,total){
+    if(!data.length)return'<div style="font-size:12px;color:var(--mu);text-align:center;padding:10px;">Aucune donnée</div>';
+    return data.map(function(d){var pct=total?Math.round(d[1]/total*100):0;return'<div class="sb-row"><div class="sb-lbl">'+d[0]+'</div><div class="sb-track"><div class="sb-fill" style="width:'+pct+'%"></div></div><div class="sb-val">'+d[1]+' ('+pct+'%)</div></div>';}).join('');
+  }
+  function countBy(key,list){var m={};list.forEach(function(x){var v=(x[key]||'?').toString().trim();if(!v||v==='Non précisé')return;m[v]=(m[v]||0)+1;});return Object.entries(m).sort(function(a,b){return b[1]-a[1];});}
+
+  // === PROMO (stats tickets offerts) ===
+  var promoHtml='<div class="kpis g2" style="margin-bottom:12px;">'
+    +'<div class="kpi"><div class="kn" style="color:var(--or)">'+tkOfferts.length+'</div><div class="kl">Tickets gratuits</div></div>'
+    +'<div class="kpi"><div class="kn" style="color:var(--or)">'+tkOfferts.filter(function(t){return t.type==='fidelite';}).length+'</div><div class="kl">Dont fidélité</div></div>'
+    +'</div>';
+  if(tkOfferts.length){
+    var offByForfait=countBy('forfait',tkOfferts);
+    promoHtml+='<div class="card"><div class="ct">Tickets gratuits par forfait</div>'+barChart(offByForfait,tkOfferts.length)+'</div>';
+  } else {
+    promoHtml+='<div class="empty"><div class="empty-t">Aucun ticket gratuit</div><div class="empty-s">Les stats apparaîtront avec les premiers tickets offerts</div></div>';
+  }
+  document.getElementById('statsPromo').innerHTML=promoHtml;
+
+  // === VENDUS (stats tickets vendus) ===
+  var totalRevenue=0;
+  tkVendus.forEach(function(t){totalRevenue+=(t.price||0);});
+  var ventesByForfait=countBy('forfait',tkVendus);
+  var ventesHtml='<div class="kpis g2" style="margin-bottom:12px;">'
+    +'<div class="kpi"><div class="kn" style="color:var(--ok)">'+tkVendus.length+'</div><div class="kl">Tickets vendus</div></div>'
+    +'<div class="kpi"><div class="kn" style="color:var(--ok)">'+totalRevenue.toLocaleString('fr-FR')+'</div><div class="kl">Revenus</div></div>'
+    +'</div>';
+  if(ventesByForfait.length){
+    ventesHtml+='<div class="card"><div class="ct">Ventes par forfait</div>';
+    ventesHtml+='<div class="tbl-wrap"><table class="tbl"><thead><tr><th>Forfait</th><th>Vendus</th><th>Prix</th><th>Total</th></tr></thead><tbody>';
+    ventesByForfait.forEach(function(v){
+      var price=getForfaitPrice(v[0]);
+      ventesHtml+='<tr><td style="font-weight:700;">'+v[0]+'</td><td>'+v[1]+'</td><td>'+price.toLocaleString('fr-FR')+'</td><td style="font-weight:700;color:var(--ok);">'+(price*v[1]).toLocaleString('fr-FR')+'</td></tr>';
+    });
+    ventesHtml+='</tbody></table></div></div>';
+    ventesHtml+='<div class="card"><div class="ct">Répartition des ventes</div>'+barChart(ventesByForfait,tkVendus.length)+'</div>';
+  } else {
+    ventesHtml+='<div class="empty"><div class="empty-t">Aucune vente</div><div class="empty-s">Les stats apparaîtront avec les premières ventes</div></div>';
+  }
+  document.getElementById('statsVentes').innerHTML=ventesHtml;
+
+  // === STATS (avis clients uniquement) ===
+  var clientsWithAvis=D.clients.filter(function(c){return!!c.avis;});
+  var na=clientsWithAvis.length;
+  var genHtml='<div class="kpis g2" style="margin-bottom:12px;">'
+    +'<div class="kpi"><div class="kn" style="color:var(--red)">'+na+'</div><div class="kl">Avis reçus</div></div>'
+    +'<div class="kpi"><div class="kn" style="color:var(--ok)">'+(D.clients.length?Math.round(na/D.clients.length*100):0)+'%</div><div class="kl">Taux d\'avis</div></div>'
+    +'</div>';
+  if(na){
+    [['situation','Situation'],['usage','Usage principal'],['budget','Budget hebdomadaire'],['priorite','Priorité']].forEach(function(v){
+      var data=countBy(v[0],clientsWithAvis);
+      genHtml+='<div class="card"><div class="ct">'+v[1]+'</div>'+barChart(data,na)+'</div>';
+    });
+  } else {
+    genHtml+='<div class="empty"><div class="empty-t">Aucun avis</div><div class="empty-s">Les stats apparaîtront quand les clients donneront leur avis</div></div>';
+  }
+  document.getElementById('statsGeneral').innerHTML=genHtml;
+}
+
+// BACKUP
+function exportBackup(){var data={clients:D.clients,tickets:D.tickets,forfaits:D.forfaits,logs:ls('logs',[]),cfg:D.cfg,v:4,date:new Date().toISOString()};var a=document.createElement('a');a.href='data:application/json;charset=utf-8,'+encodeURIComponent(JSON.stringify(data,null,2));a.download='evivi_sauvegarde_'+new Date().toISOString().slice(0,10)+'.json';a.click();toast('Sauvegarde téléchargée');}
+function exportCSV(){
+  if(!D.clients.length){toast('Aucun client');return;}
+  var bom='\uFEFF';
+  var h='Prénom;Nom;Avis;Situation;Usage;Budget;Priorité;Tickets\n';
+  var cols=['prenom','nom','avis','situation','usage','budget','priorite'];
+  var csv=bom+h+D.clients.map(function(c){return cols.map(function(k){return'"'+(c[k]||'')+'"';}).join(';')+';"'+((c.tickets||[]).join(', '))+'"';}).join('\n');
+  var a=document.createElement('a');a.href='data:text/csv;charset=utf-8,'+encodeURIComponent(csv);a.download='evivi_clients_'+new Date().toISOString().slice(0,10)+'.csv';a.click();toast('CSV exporté');
+}
+function restoreBackup(input){
+  var f=input.files[0];if(!f)return;
+  var r=new FileReader();
+  r.onload=function(e){
+    try{
+      var data=JSON.parse(e.target.result);
+      if(!data.clients||!data.tickets){document.getElementById('restoreAlert').textContent='Fichier invalide.';document.getElementById('restoreAlert').style.color='#c00';return;}
+      // Merge tickets intelligemment
+      var tkMap={};
+      D.tickets.forEach(function(t){tkMap[t.code]=t;});
+      data.tickets.forEach(function(t){
+        if(!tkMap[t.code])tkMap[t.code]=t;
+        else if(tkMap[t.code].status==='dispo'&&t.status!=='dispo')tkMap[t.code]=t;
+      });
+      D.tickets=Object.values(tkMap);ss('tickets',D.tickets);
+      // Merge clients
+      var clMap={};
+      D.clients.forEach(function(c){clMap[c.id]=c;});
+      data.clients.forEach(function(c){if(!clMap[c.id])clMap[c.id]=c;});
+      D.clients=Object.values(clMap).sort(function(a,b){return b.ts-a.ts;});
+      ss('clients',D.clients);
+      // Merge forfaits
+      if(data.forfaits){var fMap={};D.forfaits.forEach(function(f){fMap[f.id]=f;});data.forfaits.forEach(function(f){if(!fMap[f.id])fMap[f.id]=f;else fMap[f.id]=f;});D.forfaits=Object.values(fMap);ss('forfaits',D.forfaits);renderForfaitSelect();}
+      document.getElementById('restoreAlert').textContent='Restauré — '+D.clients.length+' clients, '+D.tickets.length+' tickets.';
+      document.getElementById('restoreAlert').style.color='var(--ok)';
+      renderDash();renderTickets();
+    }catch(err){document.getElementById('restoreAlert').textContent='Erreur de lecture.';document.getElementById('restoreAlert').style.color='#c00';}
+  };
+  r.readAsText(f);input.value='';
+}
+
+// FORFAITS
+function renderForfaitSelect(){
+  var sel=document.getElementById('imp-f');
+  var cats={};
+  D.forfaits.forEach(function(f){if(!cats[f.cat])cats[f.cat]=[];cats[f.cat].push(f);});
+  var html='<option value="">-- Choisir --</option>';
+  Object.keys(cats).forEach(function(cat){
+    html+='<optgroup label="'+cat+'">';
+    cats[cat].forEach(function(f){html+='<option value="'+f.name+'">'+f.name+(f.price?' — '+f.price+' CFA':' — Gratuit')+'</option>';});
+    html+='</optgroup>';
+  });
+  sel.innerHTML=html;
+}
+function renderForfaitsList(){
+  var el=document.getElementById('forfaitsList');
+  if(!D.forfaits.length){el.innerHTML='<div class="empty"><div class="empty-s">Aucun forfait</div></div>';return;}
+  el.innerHTML=D.forfaits.map(function(f){
+    var total=D.tickets.filter(function(t){return t.forfait===f.name;}).length;
+    var dispo=D.tickets.filter(function(t){return t.forfait===f.name&&t.status==='dispo';}).length;
+    var alertLow=dispo>0&&dispo<20?'<span style="color:#c00;font-weight:700;"> <i data-lucide="alert-triangle" style="width:12px;height:12px;display:inline-block;vertical-align:middle;"></i> Stock bas</span>':'';
+    var alertEmpty=total>0&&dispo===0?'<span style="color:#c00;font-weight:700;"> Épuisé</span>':'';
+    return'<div style="display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid var(--bo);">'
+      +'<div style="flex:1;min-width:0;"><div style="font-size:14px;font-weight:700;">'+f.name+'</div>'
+      +'<div style="font-size:11px;color:var(--mu);">'+f.cat+(f.price?' — '+f.price+' FCFA':' — Gratuit')+(f.validite?' · '+f.validite:'')+'</div>'
+      +'<div style="font-size:10px;color:var(--mu);margin-top:2px;">Importés : <strong>'+total+'</strong> · Disponibles : <strong style="color:'+(dispo<20?'#c00':'var(--ok)')+';">'+dispo+'</strong>'+alertLow+alertEmpty+'</div>'
+      +'</div>'
+      +'<button class="btn bg bsm" onclick="openForfaitEdit('+f.id+')">Modifier</button>'
+      +'<button class="btn bg bsm" style="color:#c00;" onclick="deleteForfait('+f.id+')">×</button>'
+      +'</div>';
+  }).join('');
+}
+function openForfaitEdit(id){
+  var f=id?D.forfaits.find(function(x){return x.id===id;}):null;
+  document.getElementById('mfe-title').textContent=f?'Modifier le forfait':'Nouveau forfait';
+  document.getElementById('fe-id').value=f?f.id:'';
+  document.getElementById('fe-name').value=f?f.name:'';
+  document.getElementById('fe-cat').value=f?f.cat:'Heures';
+  document.getElementById('fe-price').value=f?f.price:'';
+  document.getElementById('fe-validite').value=f?f.validite||'':'';
+  document.getElementById('feAlert').textContent='';
+  openM('mForfaitEdit');
+}
+function saveForfait(){
+  var name=document.getElementById('fe-name').value.trim();
+  if(!name){setA('feAlert','Nom requis.','err');return;}
+  var cat=document.getElementById('fe-cat').value;
+  var price=parseInt(document.getElementById('fe-price').value)||0;
+  var validite=document.getElementById('fe-validite').value.trim();
+  if(cat==='Promo')price=0;
+  var id=document.getElementById('fe-id').value;
+  if(id){
+    D.forfaits=D.forfaits.map(function(f){if(f.id==id){f.name=name;f.cat=cat;f.price=price;f.validite=validite;}return f;});
+  } else {
+    D.forfaits.push({id:Date.now(),name:name,cat:cat,price:price,validite:validite});
+  }
+  ss('forfaits',D.forfaits);
+  closeM('mForfaitEdit');
+  renderForfaitsList();
+  renderForfaitSelect();
+  toast(id?'Forfait modifié':'Forfait ajouté');
+}
+function deleteForfait(id){
+  if(!confirm('Supprimer ce forfait ?'))return;
+  D.forfaits=D.forfaits.filter(function(f){return f.id!==id;});
+  ss('forfaits',D.forfaits);
+  renderForfaitsList();
+  renderForfaitSelect();
+  toast('Forfait supprimé');
+}
+function getForfaitPrice(name){
+  var f=D.forfaits.find(function(x){return x.name===name;});
+  return f?f.price:0;
+}
+function getForfaitCat(name){
+  var f=D.forfaits.find(function(x){return x.name===name;});
+  return f?f.cat:'';
+}
+function getForfaitValidite(name){
+  var f=D.forfaits.find(function(x){return x.name===name;});
+  return f?f.validite||'':'';
+}
+function formatValiditeMsg(name){
+  var v=getForfaitValidite(name);
+  if(!v)return'';
+  if(v.match(/^\d+H$/i))return'Durée : '+v+' de connexion';
+  return'Durée : Illimité pendant '+v;
+}
+
+// 1. COLLER LE NOM
+function pasteFromClip(){
+  if(navigator.clipboard){navigator.clipboard.readText().then(function(t){document.getElementById('f-paste').value=t;autoParseName();}).catch(function(){});}
+}
+function autoParseName(){
+  var raw=document.getElementById('f-paste').value.trim();
+  if(!raw)return;
+  var m=raw.match(/(?:je m'appelle|je suis|appelle|nom[: ]+)\s*(.+?)(?:\s+et\s|$|\.|,|!)/i);
+  if(m){var parts=m[1].trim().split(/\s+/);document.getElementById('f-prenom').value=parts[0]||'';document.getElementById('f-nom').value=parts.slice(1).join(' ')||'';return;}
+  // Fallback: si c'est juste un nom
+  var parts=raw.replace(/^bonjour[,! ]*/i,'').replace(/^salut[,! ]*/i,'').trim().split(/\s+/);
+  if(parts.length>=2){document.getElementById('f-prenom').value=parts[0];document.getElementById('f-nom').value=parts.slice(1).join(' ');}
+}
+
+// 6. FILTRES CLIENTS
+var clFilterMode='all';
+function clFilter(btn,mode){
+  clFilterMode=mode;
+  document.querySelectorAll('#vClients .tab').forEach(function(b){b.classList.remove('on');});
+  btn.classList.add('on');
+  renderClients();
+}
+
+
+// 10. THÈME SOMBRE
+function toggleDark(){
+  var on=document.body.classList.toggle('dark');
+  ss('dark',on);
+  document.querySelector('meta[name=theme-color]').content=on?'#1c1412':'#a11313';
+  updateDarkIcon();
+}
+function updateDarkIcon(){
+  var on=document.body.classList.contains('dark');
+  var sun=document.getElementById('icSun');
+  var moon=document.getElementById('icMoon');
+  if(sun)sun.style.display=on?'block':'none';
+  if(moon)moon.style.display=on?'none':'block';
+}
+if(ls('dark',false))toggleDark();
+updateDarkIcon();
+
+// 11. HISTORIQUE
+function addLog(msg){
+  var logs=ls('logs',[]);
+  logs.unshift({ts:Date.now(),msg:msg});
+  if(logs.length>50)logs=logs.slice(0,50);
+  ss('logs',logs);
+}
+
+// 12. RAPPEL SAUVEGARDE
+function checkBackupReminder(){
+  var last=ls('lastBackup',0);
+  var days=Math.floor((Date.now()-last)/86400000);
+  var el=document.getElementById('dashBackupReminder');
+  if(days>=3&&D.clients.length>0){
+    el.style.display='block';
+    el.innerHTML='<div class="card" style="border-color:var(--or);"><div style="display:flex;align-items:center;gap:10px;"><div><i data-lucide="alert-triangle" style="width:22px;height:22px;color:var(--or);"></i></div><div style="flex:1;"><div style="font-size:13px;font-weight:700;color:var(--tx);">Sauvegarde recommandée</div><div style="font-size:11px;color:var(--mu);margin-top:2px;">Dernière sauvegarde : '+(last?'il y a '+days+' jour'+(days>1?'s':''):'jamais')+'</div></div><button class="btn br bsm" onclick="exportBackup();ss(\'lastBackup\',Date.now());checkBackupReminder();">Sauvegarder</button></div></div>';
+  } else {
+    el.style.display='none';
+  }
+}
+
+migrateData();
+if('serviceWorker' in navigator)navigator.serviceWorker.register('./sw.js').catch(function(){});
+renderForfaitSelect();
+renderDash();
+// Init Lucide icons
+if(window.lucide)lucide.createIcons();
+// Init bubble position
+setTimeout(function(){var active=document.querySelector('.bn.on');if(active)moveBubble(active);},100);
+window.addEventListener('resize',function(){var active=document.querySelector('.bn.on');if(active)moveBubble(active);});
+</script>
+</body>
+</html>
