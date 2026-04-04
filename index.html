@@ -128,6 +128,9 @@ body.dark .dz{background:var(--surf2);border-color:rgba(244,151,57,.15);}
     <i data-lucide="sun" id="icSun" style="width:16px;height:16px;display:none;"></i>
     <i data-lucide="moon" id="icMoon" style="width:16px;height:16px;"></i>
   </button>
+  <button class="top-btn" onclick="showView('vParams');document.querySelectorAll('.bn').forEach(function(b){b.classList.remove('on');});">
+    <i data-lucide="settings" style="width:16px;height:16px;"></i>
+  </button>
   <button class="top-btn" onclick="openM('mBackup')">
     <i data-lucide="download" style="width:16px;height:16px;"></i>
   </button>
@@ -139,15 +142,20 @@ body.dark .dz{background:var(--surf2);border-color:rgba(244,151,57,.15);}
   <div class="view show" id="vDash">
     <div class="ph"><h1>Bonjour, Mr MUPENDANA</h1><p id="dashDate"></p></div>
     <div id="dashBackupReminder" style="display:none;"></div>
+    <div id="dashStockAlert"></div>
     <div class="kpis g4">
       <div class="kpi"><div class="kn" style="color:var(--bl)" id="dk-dispo">0</div><div class="kl">Tickets dispo</div></div>
       <div class="kpi"><div class="kn" style="color:var(--ok)" id="dk-actif">0</div><div class="kl">Attribués</div></div>
       <div class="kpi"><div class="kn" style="color:var(--red)" id="dk-clients">0</div><div class="kl">Clients</div></div>
       <div class="kpi"><div class="kn" style="color:var(--or)" id="dk-today">0</div><div class="kl">Aujourd'hui</div></div>
     </div>
-    <div class="kpis g2" style="margin-bottom:12px;">
+    <div class="kpis g2" style="margin-bottom:6px;">
       <div class="kpi"><div class="kn" style="color:var(--ok)" id="dk-revenue">0</div><div class="kl">Revenus (CFA)</div></div>
       <div class="kpi"><div class="kn" style="color:var(--or)" id="dk-noavis">0</div><div class="kl">Avis en attente</div></div>
+    </div>
+    <div class="kpis g2" style="margin-bottom:12px;">
+      <div class="kpi"><div class="kn" style="color:var(--mu)" id="dk-noticket">0</div><div class="kl">Sans ticket</div></div>
+      <div class="kpi"><div class="kn" style="color:var(--red)" id="dk-stocklow">0</div><div class="kl">Forfaits stock bas</div></div>
     </div>
     <div class="card"><div class="ct">Clients récents</div><div id="dashActs"></div></div>
     <div class="card"><div class="ct">Nouveaux clients — 7 jours</div><div class="chart-bars" id="dashChart"></div></div>
@@ -247,6 +255,9 @@ body.dark .dz{background:var(--surf2);border-color:rgba(244,151,57,.15);}
         </div>
       </div>
     </div>
+    <div style="margin-bottom:10px;">
+      <input type="text" id="tk-search" placeholder="Rechercher un code ou client..." oninput="renderTickets()" style="width:100%;padding:8px 12px;background:var(--surf2);border:1.5px solid var(--bo);border-radius:9px;font-family:inherit;font-size:12px;outline:none;color:var(--tx);">
+    </div>
     <div class="kpis g2" style="margin-bottom:6px;">
       <div class="kpi"><div class="kn" style="color:var(--bl)" id="tk-d">0</div><div class="kl">Disponibles</div></div>
       <div class="kpi"><div class="kn" style="color:var(--tx)" id="tk-t">0</div><div class="kl">Total</div></div>
@@ -263,6 +274,30 @@ body.dark .dz{background:var(--surf2);border-color:rgba(244,151,57,.15);}
     <div id="tk-tdispo"></div>
     <div id="tk-tofferts" style="display:none;"></div>
     <div id="tk-tvendus" style="display:none;"></div>
+  </div>
+
+  <!-- PARAMÈTRES -->
+  <div class="view" id="vParams">
+    <div class="ph"><h1>Paramètres</h1><p>Messages prédéfinis et configuration</p></div>
+    <div class="card">
+      <div class="ct">Lien groupe WhatsApp VIP</div>
+      <div class="f"><input type="url" id="cfg-lien" placeholder="https://chat.whatsapp.com/..."></div>
+      <button class="btn br bf bsm" onclick="saveCfgField('lien','cfg-lien')">Enregistrer</button>
+    </div>
+    <div class="card">
+      <div class="ct">Variables disponibles</div>
+      <div style="font-size:11px;color:var(--mu);line-height:1.8;">
+        <code style="background:var(--surf2);padding:1px 5px;border-radius:4px;">{prenom}</code>
+        <code style="background:var(--surf2);padding:1px 5px;border-radius:4px;">{nom}</code>
+        <code style="background:var(--surf2);padding:1px 5px;border-radius:4px;">{code}</code>
+        <code style="background:var(--surf2);padding:1px 5px;border-radius:4px;">{motdepasse}</code>
+        <code style="background:var(--surf2);padding:1px 5px;border-radius:4px;">{forfait}</code>
+        <code style="background:var(--surf2);padding:1px 5px;border-radius:4px;">{prix}</code>
+        <code style="background:var(--surf2);padding:1px 5px;border-radius:4px;">{validite}</code>
+        <code style="background:var(--surf2);padding:1px 5px;border-radius:4px;">{lien}</code>
+      </div>
+    </div>
+    <div id="cfgTemplates"></div>
   </div>
 
   <!-- STATS -->
@@ -330,16 +365,20 @@ body.dark .dz{background:var(--surf2);border-color:rgba(244,151,57,.15);}
 <div class="overlay" id="mMsgs" onclick="closeM('mMsgs')">
   <div class="modal" onclick="event.stopPropagation()">
     <div class="mttl"><span id="mMsgs-title">Messages</span><button class="mc" onclick="closeM('mMsgs')">×</button></div>
-    <div class="tabs">
+    <div class="tabs" style="flex-wrap:wrap;">
       <button class="tab on" onclick="msgTab(this,'mm-ticket')">Accès</button>
       <button class="tab" onclick="msgTab(this,'mm-groupe')">Groupe</button>
       <button class="tab" onclick="msgTab(this,'mm-avis')">Avis</button>
       <button class="tab" onclick="msgTab(this,'mm-merci')">Merci</button>
+      <button class="tab" onclick="msgTab(this,'mm-excuse')">Excuse</button>
+      <button class="tab" onclick="msgTab(this,'mm-relance')">Relance</button>
     </div>
     <div id="mm-ticket"><div class="msg-prev" id="mm-ticket-txt"></div><button class="btn bout bf" onclick="copyModalMsg('ticket')">Copier</button></div>
     <div id="mm-groupe" style="display:none;"><div class="msg-prev" id="mm-groupe-txt"></div><button class="btn bout bf" onclick="copyModalMsg('groupe')">Copier</button></div>
     <div id="mm-avis" style="display:none;"><div class="msg-prev" id="mm-avis-txt"></div><button class="btn bout bf" onclick="copyModalMsg('avis')">Copier</button></div>
     <div id="mm-merci" style="display:none;"><div class="msg-prev" id="mm-merci-txt"></div><button class="btn bout bf" onclick="copyModalMsg('merci')">Copier</button></div>
+    <div id="mm-excuse" style="display:none;"><div class="msg-prev" id="mm-excuse-txt"></div><button class="btn bout bf" onclick="copyModalMsg('excuse')">Copier</button></div>
+    <div id="mm-relance" style="display:none;"><div class="msg-prev" id="mm-relance-txt"></div><button class="btn bout bf" onclick="copyModalMsg('relance')">Copier</button></div>
   </div>
 </div>
 
@@ -380,6 +419,23 @@ body.dark .dz{background:var(--surf2);border-color:rgba(244,151,57,.15);}
     <div class="f"><label>Forfait</label><select id="assign-forfait"></select></div>
     <div id="assignAlert" style="margin-bottom:8px;font-size:12px;font-weight:600;"></div>
     <button class="btn br bf" onclick="doAssignTicket()">Attribuer</button>
+  </div>
+</div>
+
+<!-- MODAL EDIT CLIENT -->
+<div class="overlay" id="mEditClient" onclick="closeM('mEditClient')">
+  <div class="modal" onclick="event.stopPropagation()">
+    <div class="mttl">Modifier le client <button class="mc" onclick="closeM('mEditClient')">×</button></div>
+    <input type="hidden" id="ec-id">
+    <div class="r2">
+      <div class="f"><label>Prénom</label><input type="text" id="ec-prenom"></div>
+      <div class="f"><label>Nom</label><input type="text" id="ec-nom"></div>
+    </div>
+    <div id="ecAlert" style="margin-bottom:8px;font-size:12px;font-weight:600;"></div>
+    <div class="r2">
+      <button class="btn br bf" onclick="saveEditClient()">Enregistrer</button>
+      <button class="btn bg bf" onclick="closeM('mEditClient')">Annuler</button>
+    </div>
   </div>
 </div>
 
@@ -435,7 +491,10 @@ function migrateData(){
     if(t.price==null)t.price=t.type==='offert'?0:getForfaitPrice(t.forfait);
     return t;
   });
-  ss('clients',D.clients);ss('tickets',D.tickets);
+  // Migrate cfg: add new templates if missing
+  if(!D.cfg.tplExcuse)D.cfg.tplExcuse='Bonjour {prenom} !\n\nNous sommes sincèrement désolés pour le dysfonctionnement que tu as rencontré avec ton accès WiFi.\n\nNotre équipe a identifié le problème et travaille à le résoudre dans les plus brefs délais.\n\nSi ton ticket ne fonctionne plus, nous t\'en fournirons un nouveau gratuitement.\n\nN\'hésite pas à nous contacter pour toute question :\nSupport EVIVI\n01 60 15 21 21\n\nMerci pour ta patience et ta compréhension.';
+  if(!D.cfg.tplRelance)D.cfg.tplRelance='Bonjour {prenom} !\n\nÇa fait un moment qu\'on ne t\'a pas vu sur le réseau EVIVI et tu nous manques !\n\nOn a amélioré notre service et on aimerait te retrouver parmi nos utilisateurs.\n\nRejoins notre groupe VIP pour découvrir nos dernières offres :\n{lien}\n\nÀ très bientôt !\nEVIVI\n01 60 15 21 21';
+  ss('clients',D.clients);ss('tickets',D.tickets);ss('cfg',D.cfg);
 }
 var D={
   tickets:ls('tickets',[]),
@@ -460,11 +519,13 @@ var D={
     tplFidelite:'Bonjour {prenom} !\n\nMerci pour ta fidélité ! Tu as effectué 3 achats chez EVIVI et on t\'offre un accès gratuit en récompense.\n\nForfait : {forfait}\nPrix : Gratuit\n{validite}\n\nIdentifiant : {code}\nMot de passe : {motdepasse}\n\nComment te connecter :\n1. Connecte-toi au WiFi EVIVI\n2. Le portail s\'ouvre automatiquement\n3. Clique "Se connecter avec mon ticket"\n4. Entre ton identifiant et mot de passe\n\nBonne navigation !\nSupport EVIVI\n01 60 15 21 21',
     tplGroupe:'Bonjour {prenom} !\n\nMerci de faire partie de nos clients EVIVI.\n\nRejoins notre groupe VIP pour recevoir toutes nos offres en avant-première :\n{lien}\n\nDans ce groupe tu trouveras :\n• Nos nouvelles offres et promotions\n• Les mises à jour du service\n• Un espace pour partager ton avis\n\nOn t\'y attend !\nEVIVI',
     tplAvis:'Bonjour {prenom} !\n\nOn espère que tu profites bien de ta connexion EVIVI.\n\nTon avis compte énormément pour nous. Quand tu te déconnectes, clique sur "Donner mon avis" pour nous faire ton retour.\n\nMerci pour ta confiance !\nSupport EVIVI\n01 60 15 21 21',
-    tplMerci:'Bonjour {prenom} !\n\nMerci d\'avoir fait confiance à EVIVI.\n\nReste connecté à notre communauté :\n{lien}\n\nÀ très bientôt !\nEVIVI'
+    tplMerci:'Bonjour {prenom} !\n\nMerci d\'avoir fait confiance à EVIVI.\n\nReste connecté à notre communauté :\n{lien}\n\nÀ très bientôt !\nEVIVI',
+    tplExcuse:'Bonjour {prenom} !\n\nNous sommes sincèrement désolés pour le dysfonctionnement que tu as rencontré avec ton accès WiFi.\n\nNotre équipe a identifié le problème et travaille à le résoudre dans les plus brefs délais.\n\nSi ton ticket ne fonctionne plus, nous t\'en fournirons un nouveau gratuitement.\n\nN\'hésite pas à nous contacter pour toute question :\nSupport EVIVI\n01 60 15 21 21\n\nMerci pour ta patience et ta compréhension.',
+    tplRelance:'Bonjour {prenom} !\n\nÇa fait un moment qu\'on ne t\'a pas vu sur le réseau EVIVI et tu nous manques !\n\nOn a amélioré notre service et on aimerait te retrouver parmi nos utilisateurs.\n\nRejoins notre groupe VIP pour découvrir nos dernières offres :\n{lien}\n\nÀ très bientôt !\nEVIVI\n01 60 15 21 21'
   }),
 };
 var curClientId=null;
-var TITLES={vDash:'Dashboard',vImport:'Nouveau client',vClients:'Clients',vFiche:'Fiche client',vTickets:'Tickets',vStats:'Statistiques'};
+var TITLES={vDash:'Dashboard',vImport:'Nouveau client',vClients:'Clients',vFiche:'Fiche client',vTickets:'Tickets',vStats:'Statistiques',vParams:'Paramètres'};
 function nav(btn){
   var id=btn.getAttribute('data-v');
   showView(id);
@@ -492,6 +553,7 @@ function showView(id){
   else if(id==='vClients')renderClients();
   else if(id==='vTickets')renderTickets();
   else if(id==='vStats')renderStats();
+  else if(id==='vParams')renderParams();
   setTimeout(function(){if(window.lucide)lucide.createIcons();},50);
 }
 function backToClients(){
@@ -531,6 +593,31 @@ function renderDash(){
   document.getElementById('dk-revenue').textContent=revenue.toLocaleString('fr-FR');
   var noAvis=D.clients.filter(function(c){return!c.avis;}).length;
   document.getElementById('dk-noavis').textContent=noAvis;
+  // Clients sans ticket
+  var noTicket=D.clients.filter(function(c){return!c.tickets||!c.tickets.length;}).length;
+  document.getElementById('dk-noticket').textContent=noTicket;
+  // Stock bas alert
+  var lowStock=[];
+  var forfaitStock={};
+  D.forfaits.forEach(function(f){forfaitStock[f.name]=0;});
+  D.tickets.forEach(function(t){if(t.status==='dispo'){forfaitStock[t.forfait]=(forfaitStock[t.forfait]||0)+1;}});
+  D.forfaits.forEach(function(f){
+    var count=forfaitStock[f.name]||0;
+    if(count<=5&&D.tickets.some(function(t){return t.forfait===f.name;}))lowStock.push({name:f.name,count:count});
+  });
+  document.getElementById('dk-stocklow').textContent=lowStock.length;
+  var alertEl=document.getElementById('dashStockAlert');
+  if(lowStock.length){
+    alertEl.innerHTML=lowStock.map(function(s){
+      var color=s.count===0?'#c00':'var(--or)';
+      return'<div class="card" style="border-left:3px solid '+color+';padding:10px 14px;margin-bottom:6px;display:flex;align-items:center;gap:10px;">'
+        +'<i data-lucide="alert-triangle" style="width:18px;height:18px;color:'+color+';flex-shrink:0;"></i>'
+        +'<div style="flex:1;"><div style="font-size:12px;font-weight:700;">'+(s.count===0?'Stock épuisé':'Stock bas')+' — '+s.name+'</div>'
+        +'<div style="font-size:10px;color:var(--mu);">'+s.count+' ticket(s) disponible(s)</div></div>'
+        +'<button class="btn br bsm" onclick="nav(document.querySelector(\'[data-v=vTickets]\'))">Gérer</button>'
+        +'</div>';
+    }).join('');
+  } else {alertEl.innerHTML='';}
   var actsEl=document.getElementById('dashActs');
   actsEl.innerHTML=D.clients.slice(0,5).map(function(c){
     return'<div class="cl-item" onclick="openFiche('+c.id+')">'
@@ -718,15 +805,16 @@ function openFiche(id){
         +'</div>';
     });
   }
-  // Boutons Offrir / Vendre
-  html+='<div class="r2" style="margin-bottom:11px;"><button class="btn br bf" onclick="openAssign('+id+',\'offrir\')">Offrir</button><button class="btn bout bf" onclick="openAssign('+id+',\'vendre\')">Vendre</button></div>';
+  // Boutons Offrir / Vendre + Modifier / Supprimer
+  html+='<div class="r2" style="margin-bottom:8px;"><button class="btn br bf" onclick="openAssign('+id+',\'offrir\')">Offrir</button><button class="btn bout bf" onclick="openAssign('+id+',\'vendre\')">Vendre</button></div>';
+  html+='<div class="r2" style="margin-bottom:11px;"><button class="btn bg bf bsm" onclick="openEditClient('+id+')"><i data-lucide="pencil" style="width:13px;height:13px;"></i> Modifier</button><button class="btn bg bf bsm" style="color:#c00;" onclick="deleteClient('+id+')"><i data-lucide="trash-2" style="width:13px;height:13px;"></i> Supprimer</button></div>';
   // Historique tickets
   if(tickets.length){
-    html+='<div class="card"><div class="ct">Historique tickets</div><div class="tbl-wrap"><table class="tbl"><thead><tr><th>Forfait</th><th>Identifiant</th><th>MDP</th><th>Type</th><th>Prix</th></tr></thead><tbody>';
+    html+='<div class="card"><div class="ct">Historique tickets</div><div style="font-size:10px;color:var(--mu);margin-bottom:8px;">Clique sur un ticket pour renvoyer le message</div><div class="tbl-wrap"><table class="tbl"><thead><tr><th>Forfait</th><th>Identifiant</th><th>MDP</th><th>Type</th><th>Prix</th></tr></thead><tbody>';
     tickets.forEach(function(t){
       var badge=t.type==='vendu'?'bok':(t.type==='fidelite'?'bbl':'bred');
       var label=t.type==='vendu'?'Vendu':(t.type==='fidelite'?'Fidélité':'Offert');
-      html+='<tr><td style="font-weight:700;">'+t.forfait+'</td><td style="font-family:monospace;">'+t.code+'</td><td style="font-family:monospace;">'+t.pass+'</td><td><span class="badge '+badge+'">'+label+'</span></td><td>'+(t.price?t.price.toLocaleString('fr-FR'):'Gratuit')+'</td></tr>';
+      html+='<tr style="cursor:pointer;" onclick="resendTicketMsg('+id+',\''+t.code+'\')" title="Cliquer pour renvoyer le message"><td style="font-weight:700;">'+t.forfait+'</td><td style="font-family:monospace;">'+t.code+'</td><td style="font-family:monospace;">'+t.pass+'</td><td><span class="badge '+badge+'">'+label+'</span></td><td>'+(t.price?t.price.toLocaleString('fr-FR'):'Gratuit')+'</td></tr>';
     });
     html+='</tbody></table></div></div>';
   }
@@ -743,7 +831,7 @@ function openFiche(id){
   html+='</div>';
 
   html+='<div class="card"><div class="ct">Messages personnalisés</div><div style="display:flex;flex-direction:column;gap:8px;">';
-  [['ticket','Envoyer le ticket d\'accès'],['groupe','Inviter dans le groupe'],['avis','Demander un avis'],['merci','Message de remerciement']].forEach(function(m){html+='<button class="btn bout bf" onclick="openMsgsModal('+id+',\''+m[0]+'\')">'+m[1]+'</button>';});
+  [['ticket','Envoyer le ticket d\'accès'],['groupe','Inviter dans le groupe'],['avis','Demander un avis'],['merci','Message de remerciement'],['excuse','S\'excuser (problème)'],['relance','Relancer le client']].forEach(function(m){html+='<button class="btn bout bf" onclick="openMsgsModal('+id+',\''+m[0]+'\')">'+m[1]+'</button>';});
   html+='</div></div>';
   document.getElementById('ficheContent').innerHTML=html;
   showView('vFiche');
@@ -752,13 +840,18 @@ function openMsgsModal(clientId,tab){
   var c=D.clients.find(function(x){return x.id===clientId;});
   if(!c)return;
   document.getElementById('mMsgs-title').textContent=c.prenom+' '+c.nom;
-  document.getElementById('mm-ticket-txt').textContent=buildMsg(D.cfg.tplTicket,c);
-  document.getElementById('mm-groupe-txt').textContent=buildMsg(D.cfg.tplGroupe,c);
-  document.getElementById('mm-avis-txt').textContent=buildMsg(D.cfg.tplAvis,c);
-  document.getElementById('mm-merci-txt').textContent=buildMsg(D.cfg.tplMerci,c);
+  var lastTk=null;
+  if(c.tickets&&c.tickets.length){lastTk=D.tickets.find(function(t){return t.code===c.tickets[c.tickets.length-1];});}
+  var tplTk=lastTk?(lastTk.type==='fidelite'?D.cfg.tplFidelite:(lastTk.type==='vendu'?D.cfg.tplVente:D.cfg.tplOffert)):D.cfg.tplOffert;
+  document.getElementById('mm-ticket-txt').textContent=buildMsg(tplTk,c,lastTk);
+  document.getElementById('mm-groupe-txt').textContent=buildMsg(D.cfg.tplGroupe,c,lastTk);
+  document.getElementById('mm-avis-txt').textContent=buildMsg(D.cfg.tplAvis,c,lastTk);
+  document.getElementById('mm-merci-txt').textContent=buildMsg(D.cfg.tplMerci,c,lastTk);
+  document.getElementById('mm-excuse-txt').textContent=buildMsg(D.cfg.tplExcuse,c,lastTk);
+  document.getElementById('mm-relance-txt').textContent=buildMsg(D.cfg.tplRelance,c,lastTk);
   // Activate correct tab
   document.querySelectorAll('#mMsgs .tab').forEach(function(b){b.classList.remove('on');});
-  ['mm-ticket','mm-groupe','mm-avis','mm-merci'].forEach(function(v){document.getElementById(v).style.display='none';});
+  ['mm-ticket','mm-groupe','mm-avis','mm-merci','mm-excuse','mm-relance'].forEach(function(v){document.getElementById(v).style.display='none';});
   var tId='mm-'+tab;
   document.getElementById(tId).style.display='block';
   document.querySelectorAll('#mMsgs .tab').forEach(function(b){if(b.getAttribute('onclick').includes("'"+tId+"'"))b.classList.add('on');});
@@ -873,27 +966,44 @@ function parseAvis(clientId){
 function msgTab(btn,id){
   document.querySelectorAll('#mMsgs .tab').forEach(function(b){b.classList.remove('on');});
   btn.classList.add('on');
-  ['mm-ticket','mm-groupe','mm-avis','mm-merci'].forEach(function(v){document.getElementById(v).style.display=v===id?'block':'none';});
+  ['mm-ticket','mm-groupe','mm-avis','mm-merci','mm-excuse','mm-relance'].forEach(function(v){document.getElementById(v).style.display=v===id?'block':'none';});
 }
 
 // TICKETS
 function renderTickets(){
-  var dispo=D.tickets.filter(function(t){return t.status==='dispo';});
-  var used=D.tickets.filter(function(t){return t.status!=='dispo';});
-  var offerts=used.filter(function(t){return getForfaitCat(t.forfait)==='Promo';});
-  var vendus=used.filter(function(t){return getForfaitCat(t.forfait)!=='Promo';});
+  var tkQ=((document.getElementById('tk-search')||{}).value||'').toLowerCase();
+  var allTk=tkQ?D.tickets.filter(function(t){return(t.code+' '+t.pass+' '+(t.owner||'')+' '+t.forfait).toLowerCase().includes(tkQ);}):D.tickets;
+  var dispo=allTk.filter(function(t){return t.status==='dispo';});
+  var used=allTk.filter(function(t){return t.status!=='dispo';});
+  var offerts=used.filter(function(t){return t.type==='offert'||t.type==='fidelite';});
+  var vendus=used.filter(function(t){return t.type==='vendu';});
   document.getElementById('tk-d').textContent=dispo.length;
   document.getElementById('tk-t').textContent=D.tickets.length;
   document.getElementById('tk-off').textContent=offerts.length;
   document.getElementById('tk-ven').textContent=vendus.length;
   // Disponibles
-  document.getElementById('tk-tdispo').innerHTML=dispo.length?'<div class="card"><div class="tbl-wrap"><table class="tbl"><thead><tr><th>Code</th><th>Mot de passe</th><th>Forfait</th></tr></thead><tbody>'+dispo.map(function(t){return'<tr><td style="font-family:monospace;font-weight:700;">'+t.code+'</td><td style="font-family:monospace;">'+t.pass+'</td><td>'+t.forfait+'</td></tr>';}).join('')+'</tbody></table></div></div>':'<div class="empty"><div class="empty-t">Aucun ticket disponible</div><div class="empty-s">Importe des tickets depuis Mikhmon</div></div>';
+  // Group dispo by forfait for "Vider stock" buttons
+  var dispoByForfait={};
+  dispo.forEach(function(t){if(!dispoByForfait[t.forfait])dispoByForfait[t.forfait]=0;dispoByForfait[t.forfait]++;});
+  var clearBtns=Object.keys(dispoByForfait).length?'<div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:10px;">'+Object.keys(dispoByForfait).map(function(f){return'<button class="btn bg bsm" style="color:#c00;" onclick="clearStock(\''+f.replace(/'/g,"\\'")+'\')">Vider '+f+' ('+dispoByForfait[f]+')</button>';}).join('')+'</div>':'';
+  document.getElementById('tk-tdispo').innerHTML=dispo.length?clearBtns+'<div class="card"><div class="tbl-wrap"><table class="tbl"><thead><tr><th>Code</th><th>Mot de passe</th><th>Forfait</th><th></th></tr></thead><tbody>'+dispo.map(function(t){return'<tr><td style="font-family:monospace;font-weight:700;">'+t.code+'</td><td style="font-family:monospace;">'+t.pass+'</td><td>'+t.forfait+'</td><td><button class="btn bg bsm" style="color:#c00;padding:4px 8px;" onclick="deleteTicket(\''+t.code+'\')">×</button></td></tr>';}).join('')+'</tbody></table></div></div>':'<div class="empty"><div class="empty-t">Aucun ticket disponible</div><div class="empty-s">Importe des tickets depuis Mikhmon</div></div>';
   // Offerts (promo)
   document.getElementById('tk-tofferts').innerHTML=offerts.length?'<div class="card"><div class="tbl-wrap"><table class="tbl"><thead><tr><th>Code</th><th>Client</th><th>Forfait</th></tr></thead><tbody>'+offerts.map(function(t){return'<tr><td style="font-family:monospace;font-weight:700;">'+t.code+'</td><td>'+(t.owner||'—')+'</td><td>'+t.forfait+'</td></tr>';}).join('')+'</tbody></table></div></div>':'<div class="empty"><div class="empty-t">Aucun ticket offert</div></div>';
   // Vendus
   document.getElementById('tk-tvendus').innerHTML=vendus.length?'<div class="card"><div class="tbl-wrap"><table class="tbl"><thead><tr><th>Code</th><th>Client</th><th>Forfait</th><th>Prix</th></tr></thead><tbody>'+vendus.map(function(t){return'<tr><td style="font-family:monospace;font-weight:700;">'+t.code+'</td><td>'+(t.owner||'—')+'</td><td>'+t.forfait+'</td><td style="font-weight:700;color:var(--ok);">'+(t.price||getForfaitPrice(t.forfait))+'</td></tr>';}).join('')+'</tbody></table></div></div>':'<div class="empty"><div class="empty-t">Aucune vente</div></div>';
 }
 function tkTab(btn,id){document.querySelectorAll('#vTickets .tab').forEach(function(b){b.classList.remove('on');});btn.classList.add('on');['tk-tdispo','tk-tofferts','tk-tvendus'].forEach(function(v){document.getElementById(v).style.display=v===id?'block':'none';});}
+function deleteTicket(code){
+  if(!confirm('Supprimer le ticket '+code+' ?'))return;
+  D.tickets=D.tickets.filter(function(t){return t.code!==code;});
+  ss('tickets',D.tickets);addLog('Ticket '+code+' supprimé');toast('Ticket supprimé');renderTickets();renderDash();
+}
+function clearStock(forfaitName){
+  var count=D.tickets.filter(function(t){return t.status==='dispo'&&t.forfait===forfaitName;}).length;
+  if(!confirm('Supprimer les '+count+' tickets disponibles de '+forfaitName+' ?'))return;
+  D.tickets=D.tickets.filter(function(t){return!(t.status==='dispo'&&t.forfait===forfaitName);});
+  ss('tickets',D.tickets);addLog(count+' tickets '+forfaitName+' supprimés');toast(count+' tickets supprimés');renderTickets();renderDash();
+}
 function importFile(input){var f=input.files[0];if(!f)return;var r=new FileReader();r.onload=function(e){document.getElementById('impPaste').value=e.target.result;};r.readAsText(f);input.value='';}
 function doImport(){
   var fName=document.getElementById('imp-f').value;
@@ -983,6 +1093,93 @@ function renderStats(){
     genHtml+='<div class="empty"><div class="empty-t">Aucun avis</div><div class="empty-s">Les stats apparaîtront quand les clients donneront leur avis</div></div>';
   }
   document.getElementById('statsGeneral').innerHTML=genHtml;
+}
+
+// RESEND TICKET MSG
+function resendTicketMsg(clientId,ticketCode){
+  var c=D.clients.find(function(x){return x.id===clientId;});
+  var tk=D.tickets.find(function(x){return x.code===ticketCode;});
+  if(!c||!tk)return;
+  var tpl=tk.type==='fidelite'?D.cfg.tplFidelite:(tk.type==='vendu'?D.cfg.tplVente:D.cfg.tplOffert);
+  document.getElementById('mMsgs-title').textContent=c.prenom+' '+c.nom+' — '+tk.code;
+  document.getElementById('mm-ticket-txt').textContent=buildMsg(tpl,c,tk);
+  document.getElementById('mm-groupe-txt').textContent=buildMsg(D.cfg.tplGroupe,c,tk);
+  document.getElementById('mm-avis-txt').textContent=buildMsg(D.cfg.tplAvis,c,tk);
+  document.getElementById('mm-merci-txt').textContent=buildMsg(D.cfg.tplMerci,c,tk);
+  document.getElementById('mm-excuse-txt').textContent=buildMsg(D.cfg.tplExcuse,c,tk);
+  document.getElementById('mm-relance-txt').textContent=buildMsg(D.cfg.tplRelance,c,tk);
+  msgTab(document.querySelector('#mMsgs .tab'),'mm-ticket');
+  openM('mMsgs');
+}
+
+// EDIT / DELETE CLIENT
+function openEditClient(id){
+  var c=D.clients.find(function(x){return x.id===id;});
+  if(!c)return;
+  document.getElementById('ec-id').value=id;
+  document.getElementById('ec-prenom').value=c.prenom||'';
+  document.getElementById('ec-nom').value=c.nom||'';
+  document.getElementById('ecAlert').textContent='';
+  openM('mEditClient');
+}
+function saveEditClient(){
+  var id=parseInt(document.getElementById('ec-id').value);
+  var prenom=document.getElementById('ec-prenom').value.trim();
+  var nom=document.getElementById('ec-nom').value.trim();
+  if(!prenom){setA('ecAlert','Prénom requis.','err');return;}
+  if(!nom){setA('ecAlert','Nom requis.','err');return;}
+  D.clients=D.clients.map(function(c){
+    if(c.id===id){c.prenom=prenom;c.nom=nom;}
+    return c;
+  });
+  ss('clients',D.clients);
+  // Update ticket owners
+  var c=D.clients.find(function(x){return x.id===id;});
+  if(c){(c.tickets||[]).forEach(function(code){var t=D.tickets.find(function(x){return x.code===code;});if(t)t.owner=prenom+' '+nom;});ss('tickets',D.tickets);}
+  closeM('mEditClient');
+  toast('Client modifié');
+  openFiche(id);
+}
+function deleteClient(id){
+  var c=D.clients.find(function(x){return x.id===id;});
+  if(!c)return;
+  if(!confirm('Supprimer '+c.prenom+' '+c.nom+' ?\nSes tickets attribués resteront dans l\'historique.'))return;
+  D.clients=D.clients.filter(function(x){return x.id!==id;});
+  ss('clients',D.clients);
+  addLog(c.prenom+' '+c.nom+' supprimé');
+  toast('Client supprimé');
+  backToClients();
+  renderDash();
+}
+
+// PARAMS
+var TPL_LIST=[
+  {key:'tplOffert',label:'Ticket offert (promo)'},
+  {key:'tplVente',label:'Ticket vendu'},
+  {key:'tplFidelite',label:'Ticket fidélité'},
+  {key:'tplGroupe',label:'Invitation groupe VIP'},
+  {key:'tplAvis',label:'Demande d\'avis'},
+  {key:'tplMerci',label:'Remerciement'},
+  {key:'tplExcuse',label:'Excuse (problème/dysfonctionnement)'},
+  {key:'tplRelance',label:'Relance client inactif'}
+];
+function renderParams(){
+  document.getElementById('cfg-lien').value=D.cfg.lien||'';
+  var el=document.getElementById('cfgTemplates');
+  el.innerHTML=TPL_LIST.map(function(t){
+    return'<div class="card"><div class="ct">'+t.label+'</div>'
+      +'<div class="f"><textarea id="cfg-'+t.key+'" rows="8" style="font-size:12px;line-height:1.7;">'+((D.cfg[t.key]||'').replace(/</g,'&lt;'))+'</textarea></div>'
+      +'<button class="btn br bf bsm" onclick="saveCfgTpl(\''+t.key+'\',\'cfg-'+t.key+'\')">Enregistrer</button>'
+      +'</div>';
+  }).join('');
+}
+function saveCfgField(key,inputId){
+  D.cfg[key]=document.getElementById(inputId).value.trim();
+  ss('cfg',D.cfg);toast('Enregistré');
+}
+function saveCfgTpl(key,textareaId){
+  D.cfg[key]=document.getElementById(textareaId).value;
+  ss('cfg',D.cfg);toast('Message "'+TPL_LIST.find(function(t){return t.key===key;}).label+'" enregistré');
 }
 
 // BACKUP
